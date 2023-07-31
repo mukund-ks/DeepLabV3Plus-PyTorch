@@ -4,6 +4,7 @@ import torch.nn.functional as F
 import torchvision.models as models
 from torchsummary import summary
 
+# TODO: Add L2, Batch Normalization and Dropout
 
 class ASPPModule(nn.Module):
     def __init__(self, in_channels, out_channels, dilations):
