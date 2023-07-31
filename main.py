@@ -63,6 +63,8 @@ csv_header = [
     "Avg Dice Coeff Val",
 ]
 
+best_val_loss = float('inf')
+
 with open(csv_file, "w", newline="") as f:
     csv_writer = csv.writer(f)
     csv_writer.writerow(csv_header)
@@ -170,6 +172,10 @@ with open(csv_file, "w", newline="") as f:
             f"Avg Dice Coeff Val: {avg_dice_coefficient_val:.4f}\n"
             f"{'-'*10}"
         )
+        
+        if val_loss < best_val_loss:
+            best_val_loss = val_loss
+            torch.save(model.state_dict(), "best_model.pth")
 
         # Append the training and validation logs to the CSV file
         csv_writer.writerow(
