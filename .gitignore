@@ -2,3 +2,6 @@ __pycache__
 data_ews
 env
 eval_ews
+eval_output
+best_model.pth
+training_logs.csv

@@ -13,8 +13,8 @@ data_dir = "./data_ews"
 input_size = (256, 256)
 batch_size = 4
 num_classes = 1
-learning_rate = 0.001
-num_epochs = 10
+learning_rate = 1e-4
+num_epochs = 80
 
 train_transform = A.Compose(
     [
@@ -54,7 +54,8 @@ scheduler = optim.lr_scheduler.ReduceLROnPlateau(
 csv_file = "training_logs.csv"
 csv_header = [
     "Epoch",
-    "Train Loss",
+    "Avg Train Loss",
+    "Avg Val Loss",
     "Avg IoU Train",
     "Avg IoU Val",
     "Avg Pix Acc Train",
@@ -63,7 +64,7 @@ csv_header = [
     "Avg Dice Coeff Val",
 ]
 
-best_val_loss = float('inf')
+best_val_loss = float("inf")
 
 with open(csv_file, "w", newline="") as f:
     csv_writer = csv.writer(f)
@@ -87,12 +88,12 @@ with open(csv_file, "w", newline="") as f:
             optimizer.zero_grad()
 
             outputs = model(images)
-            loss = criterion(torch.sigmoid(outputs), masks)
+            t_loss = criterion(torch.sigmoid(outputs), masks)
 
-            loss.backward()
+            t_loss.backward()
             optimizer.step()
 
-            train_loss += loss.item()
+            train_loss += t_loss.item()
 
             # Calculating metrics for training
             with torch.no_grad():
@@ -107,7 +108,7 @@ with open(csv_file, "w", newline="") as f:
 
             # Displaying metrics in the progress bar description
             train_dataloader.set_postfix(
-                loss=loss.item(),
+                loss=t_loss.item(),
                 train_iou=iou_train,
                 train_pix_acc=pixel_accuracy_train,
                 train_dice_coef=dice_coefficient_train,
@@ -147,7 +148,7 @@ with open(csv_file, "w", newline="") as f:
 
                 # Displaying metrics in progress bar description
                 test_dataloader.set_postfix(
-                    val_loss=val_loss,
+                    val_loss=v_loss.item(),
                     val_iou=iou_val,
                     val_pix_acc=pixel_accuracy_val,
                     val_dice_coef=dice_coefficient_val,
@@ -157,25 +158,30 @@ with open(csv_file, "w", newline="") as f:
         avg_iou_val = total_iou_val / len(test_dataloader)
         avg_pixel_accuracy_val = total_pixel_accuracy_val / len(test_dataloader)
         avg_dice_coefficient_val = total_dice_coefficient_val / len(test_dataloader)
-        
+
         scheduler.step(val_loss)
 
         print(
             f"\nEpoch {epoch + 1}/{num_epochs}\n"
-            f"Train Loss: {train_loss:.4f}\n"
-            f"Validation Loss: {val_loss:.4f}\n"
+            f"Avg Train Loss: {train_loss:.4f}\n"
+            f"Avg Validation Loss: {val_loss:.4f}\n"
             f"Avg IoU Train: {avg_iou_train:.4f}\n"
             f"Avg IoU Val: {avg_iou_val:.4f}\n"
             f"Avg Pix Acc Train: {avg_dice_coefficient_train:.4f}\n"
             f"Avg Pix Acc Val: {avg_pixel_accuracy_val:.4f}\n"
             f"Avg Dice Coeff Train: {avg_dice_coefficient_train:.4f}\n"
             f"Avg Dice Coeff Val: {avg_dice_coefficient_val:.4f}\n"
-            f"{'-'*10}"
+            f"{'-'*50}"
         )
-        
+
         if val_loss < best_val_loss:
+            print(
+                f"\nCurrent Validation Loss: {val_loss} better than previous Validation Loss: {best_val_loss}\n"
+            )
             best_val_loss = val_loss
             torch.save(model.state_dict(), "best_model.pth")
+            print("Saved Best Model!\n")
+            print(f"{'-'*50}")
 
         # Append the training and validation logs to the CSV file
         csv_writer.writerow(

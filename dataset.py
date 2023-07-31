@@ -115,5 +115,5 @@ if __name__ == "__main__":
 
     for images, masks in train_dataloader:
         # Use the train data here for training
-        print(f"Image: {images}")
-        print(f"Mask: {masks}")
+        print(f"Image: {images.shape}")
+        print(f"Mask: {masks.shape}")
