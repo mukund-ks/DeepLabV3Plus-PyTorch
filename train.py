@@ -88,7 +88,7 @@ with open(csv_file, "w", newline="") as f:
             optimizer.zero_grad()
 
             outputs = model(images)
-            t_loss = criterion(torch.sigmoid(outputs), masks)
+            t_loss = criterion(outputs, masks)
 
             t_loss.backward()
             optimizer.step()
@@ -97,7 +97,7 @@ with open(csv_file, "w", newline="") as f:
 
             # Calculating metrics for training
             with torch.no_grad():
-                pred_masks = torch.sigmoid(outputs) > 0.5
+                pred_masks = outputs > 0.5
                 iou_train, dice_coefficient_train, pixel_accuracy_train = calculate_metrics(
                     pred_masks, masks
                 )
@@ -133,11 +133,11 @@ with open(csv_file, "w", newline="") as f:
                 images, masks = images.to(device), masks.to(device)
                 outputs = model(images)
 
-                v_loss = criterion(torch.sigmoid(outputs), masks)
+                v_loss = criterion(outputs, masks)
                 val_loss += v_loss.item()
 
                 # Calculating metrics for Validation
-                pred_masks = torch.sigmoid(outputs) > 0.5
+                pred_masks = outputs > 0.5
                 iou_val, dice_coefficient_val, pixel_accuracy_val = calculate_metrics(
                     pred_masks, masks
                 )
