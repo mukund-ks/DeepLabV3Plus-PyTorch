@@ -4,14 +4,14 @@ import torch.nn.functional as F
 import torchvision.models as models
 from torchsummary import summary
 
-# TODO: Add L2, Batch Normalization and Dropout
+# TODO: Add L2 Regularization and Dropout
 
 
 class ASPPModule(nn.Module):
     def __init__(self, in_channels, out_channels, dilations):
         super(ASPPModule, self).__init__()
 
-        # Dilated Convolutions
+        # Atrous Convolution 1
         self.at_conv1 = nn.Conv2d(
             in_channels,
             out_channels,
@@ -21,6 +21,7 @@ class ASPPModule(nn.Module):
             bias=False,
         )
 
+        # Atrous Convolution 2
         self.at_conv2 = nn.Conv2d(
             in_channels,
             out_channels,
@@ -30,6 +31,7 @@ class ASPPModule(nn.Module):
             bias=False,
         )
 
+        # Atrous Convolution 3
         self.at_conv3 = nn.Conv2d(
             in_channels,
             out_channels,
@@ -39,43 +41,49 @@ class ASPPModule(nn.Module):
             bias=False,
         )
 
-        self.batchnorm = nn.BatchNorm2d(out_channels)
-        
-        self.relu = nn.ReLU()
+        self.batch_norm = nn.BatchNorm2d(out_channels)
 
+        self.relu = nn.ReLU()
+        
+        # Upsampling by Bilinear Interpolation
         self.upsample = nn.UpsamplingBilinear2d(scale_factor=16)
 
+        # Global Average Pooling
         self.avgpool = nn.AvgPool2d(kernel_size=(16, 16))
 
-        # 1x1 Convolution for the global context
+        # 1x1 Convolution 
         self.conv1x1 = nn.Conv2d(
             in_channels, out_channels, kernel_size=1, padding="same", bias=False
         )
 
-        # Final 1x1 Convolution to combine the branches and global context
-        self.final_conv = nn.Conv2d(out_channels * 5, out_channels, kernel_size=1)
+        # Final 1x1 Convolution 
+        self.final_conv = nn.Conv2d(out_channels * 5, out_channels, kernel_size=1, padding='same', bias=False)
 
     def forward(self, x):
+        # 1x1 Convolution
         x1 = self.conv1x1(x)
-        x1 = self.batchnorm(x1)
+        x1 = self.batch_norm(x1)
         x1 = self.relu(x1)
 
+        # Atrous Convolution - Rate: 6
         x2 = self.at_conv1(x)
-        x2 = self.batchnorm(x2)
+        x2 = self.batch_norm(x2)
         x2 = self.relu(x2)
 
+        # Atrous Convolution - Rate: 12
         x3 = self.at_conv2(x)
-        x3 = self.batchnorm(x3)
+        x3 = self.batch_norm(x3)
         x3 = self.relu(x3)
 
+        # Atrous Convolution - Rate: 18
         x4 = self.at_conv3(x)
-        x4 = self.batchnorm(x4)
+        x4 = self.batch_norm(x4)
         x4 = self.relu(x4)
 
         # Global Average Pooling and 1x1 Convolution for global context
         avg_pool = self.avgpool(x)
         avg_pool = self.conv1x1(avg_pool)
-        avg_pool = self.batchnorm(avg_pool)
+        avg_pool = self.batch_norm(avg_pool)
         avg_pool = self.relu(avg_pool)
         avg_pool = self.upsample(avg_pool)
 
@@ -84,6 +92,8 @@ class ASPPModule(nn.Module):
 
         # Final Convolution for ASPP Output
         aspp_output = self.final_conv(combined_output)
+        aspp_output = self.batch_norm(aspp_output)
+        aspp_output = self.relu(aspp_output)
 
         return aspp_output
 
@@ -91,25 +101,43 @@ class ASPPModule(nn.Module):
 class DecoderModule(nn.Module):
     def __init__(self, in_channels, out_channels):
         super(DecoderModule, self).__init__()
-
+        
+        # Upsampling by Bilinear Interpolation
         self.upsample = nn.UpsamplingBilinear2d(scale_factor=4)
 
-        self.conv_low = nn.Conv2d(in_channels, 48, kernel_size=1)
+        self.conv_low = nn.Conv2d(in_channels, 48, kernel_size=1, padding='same', bias=False)
 
-        self.final_conv1 = nn.Conv2d(in_channels=304, out_channels=256, kernel_size=3, padding=1)
+        self.batch_norm = nn.BatchNorm2d(48)
+        
+        self.batch_norm2 = nn.BatchNorm2d(out_channels)
 
-        self.final_conv2 = nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1)
+        self.relu = nn.ReLU()
+
+        self.final_conv1 = nn.Conv2d(in_channels=304, out_channels=256, kernel_size=3, padding='same', bias=False)
+
+        self.final_conv2 = nn.Conv2d(in_channels, out_channels, kernel_size=3, padding='same', bias=False)
 
     def forward(self, x_high, x_low):
+        # Upsampling High-Level Features
         x_high = self.upsample(x_high)
 
+        # 1x1 Convolution on Low-Level Features
         x_low = self.conv_low(x_low)
+        x_low = self.batch_norm(x_low)
+        x_low = self.relu(x_low)
 
+        # Concatenating High-Level and Low-Level Features
         x = torch.cat((x_high, x_low), dim=1)
 
+        # 3x3 Convolution on Concatenated Feature Map
         x = self.final_conv1(x)
+        x = self.batch_norm2(x)
+        x = self.relu(x)        
 
+        # 3x3 Convolution on Concatenated Feature Map
         x = self.final_conv2(x)
+        x = self.batch_norm2(x)
+        x = self.relu(x)
 
         return x
 
@@ -126,6 +154,7 @@ class DeepLabV3Plus(nn.Module):
 
         dilations = [6, 12, 18]
 
+        # ASPP Module
         self.aspp = ASPPModule(in_channels, out_channels, dilations)
 
         # Decoder Module
@@ -134,8 +163,9 @@ class DeepLabV3Plus(nn.Module):
         # Upsampling with Bilinear Interpolation
         self.upsample = nn.UpsamplingBilinear2d(scale_factor=4)
 
-        # Final convolution layer for binary segmentation
         self.final_conv = nn.Conv2d(out_channels, num_classes, kernel_size=1)
+        
+        self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
         # Getting Low-Level Features
@@ -150,10 +180,12 @@ class DeepLabV3Plus(nn.Module):
         # Decoder forward pass - Concatenating Features
         x = self.decoder(x, x_low)
 
-        # Upsampling Concatenating Features
+        # Upsampling Concatenated Features
         x = self.upsample(x)
 
+        # Final 1x1 Convolution for Binary-Seg
         x = self.final_conv(x)
+        x = self.sigmoid(x)
 
         return x
 
