@@ -6,38 +6,81 @@ from torchsummary import summary
 
 # TODO: Add L2, Batch Normalization and Dropout
 
+
 class ASPPModule(nn.Module):
     def __init__(self, in_channels, out_channels, dilations):
         super(ASPPModule, self).__init__()
 
-        # Branches with dilated convolutions
-        self.branches = nn.ModuleList(
-            [
-                nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=d, dilation=d)
-                for d in dilations
-            ]
+        # Dilated Convolutions
+        self.at_conv1 = nn.Conv2d(
+            in_channels,
+            out_channels,
+            kernel_size=3,
+            dilation=dilations[0],
+            padding="same",
+            bias=False,
         )
+
+        self.at_conv2 = nn.Conv2d(
+            in_channels,
+            out_channels,
+            kernel_size=3,
+            dilation=dilations[1],
+            padding="same",
+            bias=False,
+        )
+
+        self.at_conv3 = nn.Conv2d(
+            in_channels,
+            out_channels,
+            kernel_size=3,
+            dilation=dilations[2],
+            padding="same",
+            bias=False,
+        )
+
+        self.batchnorm = nn.BatchNorm2d(out_channels)
+        
+        self.relu = nn.ReLU()
+
+        self.upsample = nn.UpsamplingBilinear2d(scale_factor=16)
+
+        self.avgpool = nn.AvgPool2d(kernel_size=(16, 16))
 
         # 1x1 Convolution for the global context
-        self.conv1x1 = nn.Conv2d(in_channels, out_channels, kernel_size=1)
+        self.conv1x1 = nn.Conv2d(
+            in_channels, out_channels, kernel_size=1, padding="same", bias=False
+        )
 
         # Final 1x1 Convolution to combine the branches and global context
-        self.final_conv = nn.Conv2d(
-            out_channels * (len(dilations) + 1), out_channels, kernel_size=1
-        )
+        self.final_conv = nn.Conv2d(out_channels * 5, out_channels, kernel_size=1)
 
     def forward(self, x):
-        branches_outputs = [branch(x) for branch in self.branches]
+        x1 = self.conv1x1(x)
+        x1 = self.batchnorm(x1)
+        x1 = self.relu(x1)
+
+        x2 = self.at_conv1(x)
+        x2 = self.batchnorm(x2)
+        x2 = self.relu(x2)
+
+        x3 = self.at_conv2(x)
+        x3 = self.batchnorm(x3)
+        x3 = self.relu(x3)
+
+        x4 = self.at_conv3(x)
+        x4 = self.batchnorm(x4)
+        x4 = self.relu(x4)
 
         # Global Average Pooling and 1x1 Convolution for global context
-        global_avg_pool_output = F.adaptive_avg_pool2d(x, output_size=1)
-        global_avg_pool_output = self.conv1x1(global_avg_pool_output)
-        global_avg_pool_output = F.interpolate(
-            global_avg_pool_output, size=x.size()[2:], mode="bilinear", align_corners=True
-        )
+        avg_pool = self.avgpool(x)
+        avg_pool = self.conv1x1(avg_pool)
+        avg_pool = self.batchnorm(avg_pool)
+        avg_pool = self.relu(avg_pool)
+        avg_pool = self.upsample(avg_pool)
 
         # Concatenating Dilated Convolutions and Global Average Pooling
-        combined_output = torch.cat([*branches_outputs, global_avg_pool_output], dim=1)
+        combined_output = torch.cat((*[x1, x2, x3, x4], avg_pool), dim=1)
 
         # Final Convolution for ASPP Output
         aspp_output = self.final_conv(combined_output)
@@ -54,7 +97,7 @@ class DecoderModule(nn.Module):
         self.conv_low = nn.Conv2d(in_channels, 48, kernel_size=1)
 
         self.final_conv1 = nn.Conv2d(in_channels=304, out_channels=256, kernel_size=3, padding=1)
-        
+
         self.final_conv2 = nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1)
 
     def forward(self, x_high, x_low):
@@ -65,7 +108,7 @@ class DecoderModule(nn.Module):
         x = torch.cat((x_high, x_low), dim=1)
 
         x = self.final_conv1(x)
-        
+
         x = self.final_conv2(x)
 
         return x
@@ -81,13 +124,13 @@ class DeepLabV3Plus(nn.Module):
         in_channels = 1024
         out_channels = 256
 
-        dilations = [1, 6, 12, 18]
+        dilations = [6, 12, 18]
 
         self.aspp = ASPPModule(in_channels, out_channels, dilations)
 
         # Decoder Module
         self.decoder = DecoderModule(out_channels, out_channels)
-        
+
         # Upsampling with Bilinear Interpolation
         self.upsample = nn.UpsamplingBilinear2d(scale_factor=4)
 
@@ -95,21 +138,25 @@ class DeepLabV3Plus(nn.Module):
         self.final_conv = nn.Conv2d(out_channels, num_classes, kernel_size=1)
 
     def forward(self, x):
-        low_level_features = self.backbone[:-3](x)
+        # Getting Low-Level Features
+        x_low = self.backbone[:-3](x)
 
+        # Getting Image Features from Backbone
         x = self.backbone[:-1](x)
 
-        # ASPP forward pass
+        # ASPP forward pass - High-Level Features
         x = self.aspp(x)
 
-        # Decoder forward pass
-        x = self.decoder(x, low_level_features)
+        # Decoder forward pass - Concatenating Features
+        x = self.decoder(x, x_low)
 
+        # Upsampling Concatenating Features
         x = self.upsample(x)
-        
+
         x = self.final_conv(x)
 
         return x
+
 
 if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -117,7 +164,7 @@ if __name__ == "__main__":
     model.to(device)
 
     # Random input tensor for testing
-    batch_size = 1
+    batch_size = 2
     input_channels = 3
     height, width = 256, 256
     random_input = torch.randn(batch_size, input_channels, height, width).to(device)
