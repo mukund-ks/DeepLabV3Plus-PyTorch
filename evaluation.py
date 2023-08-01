@@ -1,13 +1,12 @@
 import os
 import numpy as np
+import cv2
 import torch
-import torchvision.transforms.functional as TF
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
 from torch.utils.data import DataLoader
 from model import DeepLabV3Plus
 from dataset import EvalDataset
-from PIL import Image
 
 num_classes = 1
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -34,30 +33,37 @@ eval_dataloader = DataLoader(eval_dataset, batch_size=1, shuffle=False)
 
 
 def save_overlay_image(image_path, mask_path, prediction, overlay_path):
-    input_image = Image.open(image_path).convert("RGB")
-    ground_truth_mask = Image.open(mask_path).convert("L")
-    predicted_mask = Image.fromarray((prediction * 255).astype(np.uint8))
+    line = np.ones((256, 10, 3)) * 128
 
-    # Overlay the prediction on the input image
-    overlay = Image.blend(input_image, predicted_mask.convert("RGB"), alpha=0.5)
+    input_image = cv2.imread(image_path, cv2.IMREAD_COLOR)
+    ground_truth_mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
 
-    # Arrange the images horizontally and save the result
-    result_image = Image.new("RGB", (input_image.width * 4, input_image.height))
-    result_image.paste(input_image, (0, 0))
-    result_image.paste(ground_truth_mask, (input_image.width, 0))
-    result_image.paste(predicted_mask.convert("RGB"), (input_image.width*2, 0))
-    result_image.paste(overlay, (input_image.width * 3, 0))
+    ground_truth_mask = np.expand_dims(ground_truth_mask, axis=-1)
+    ground_truth_mask = np.concatenate(
+        [ground_truth_mask, ground_truth_mask, ground_truth_mask], axis=-1
+    )
+    
+    prediction = np.expand_dims(prediction, axis=-1)
+    prediction = np.concatenate([prediction, prediction, prediction], axis=-1)
 
-    result_image.save(overlay_path)
+    overlay = input_image * prediction
+    prediction = prediction * 255
+
+    final_img = np.concatenate(
+        [input_image, line, ground_truth_mask, line, prediction, line, overlay], axis=1
+    )
+
+    cv2.imwrite(overlay_path, final_img)
+    return
 
 
 with torch.no_grad():
     for i, (images, masks) in enumerate(eval_dataloader):
         images = images.to(device)
-        
+
         outputs = model(images)
-        prediction = torch.sigmoid(outputs).cpu().numpy()[0, 0]
-        
+        prediction = outputs.cpu().numpy()[0, 0]
+
         image_path = os.path.join(eval_dataset.image_dir, eval_dataset.image_filenames[i])
         mask_path = os.path.join(eval_dataset.mask_dir, eval_dataset.mask_filenames[i])
 

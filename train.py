@@ -176,7 +176,7 @@ with open(csv_file, "w", newline="") as f:
 
         if val_loss < best_val_loss:
             print(
-                f"\nCurrent Validation Loss: {val_loss} better than previous Validation Loss: {best_val_loss}\n"
+                f"\nCurrent Validation Loss: {val_loss:.4f} is better than previous Validation Loss: {best_val_loss:.4f}\n"
             )
             best_val_loss = val_loss
             torch.save(model.state_dict(), "best_model.pth")
