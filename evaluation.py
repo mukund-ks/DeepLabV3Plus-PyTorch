@@ -11,7 +11,7 @@ from dataset import EvalDataset
 num_classes = 1
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-model = DeepLabV3Plus(num_classes=num_classes)
+model = DeepLabV3Plus(num_classes=num_classes, weight_decay=1e-8)
 model.load_state_dict(torch.load("best_model.pth"))
 model.to(device)
 model.eval()
