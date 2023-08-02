@@ -49,7 +49,7 @@ model.to(device)
 
 criterion = DiceLoss()
 
-optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-5)
+optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-3)
 
 scheduler = optim.lr_scheduler.ReduceLROnPlateau(
     optimizer, mode="min", patience=5, factor=0.1, verbose=True

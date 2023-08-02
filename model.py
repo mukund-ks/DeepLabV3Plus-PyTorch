@@ -6,7 +6,6 @@ from torchsummary import summary
 
 # TODO:
 #   * Add Squeeze & Excitation Module
-#   * Add L2 Regularization
 
 
 class ASPPModule(nn.Module):
