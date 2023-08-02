@@ -9,12 +9,16 @@ from dataset import CustomDataset
 from model import DeepLabV3Plus
 from metrics import DiceLoss, calculate_metrics
 
+# TODO:
+#   * Refactor Code
+#   * write main entry point
+
 data_dir = "./data_ews"
 input_size = (256, 256)
 batch_size = 4
 num_classes = 1
-learning_rate = 1e-5
-num_epochs = 150
+learning_rate = 1e-3
+num_epochs = 200
 
 train_transform = A.Compose(
     [
@@ -185,13 +189,13 @@ with open(csv_file, "w", newline="") as f:
         )
 
         if val_loss < best_val_loss:
-            print(
-                f"\nCurrent Validation Loss: {val_loss:.4f} is better than previous Validation Loss: {best_val_loss:.4f}\n"
-            )
+            print(f"\nval_loss improved from {best_val_loss:.4f} to {val_loss:.4f}\n")
             best_val_loss = val_loss
             torch.save(model.state_dict(), "best_model.pth")
             print("Saved Best Model!\n")
             print(f"{'-'*50}")
+        else:
+            print(f"\nval_loss did not improve from {best_val_loss:.4f}")
 
         # Append the training and validation logs to the CSV file
         csv_writer.writerow(
