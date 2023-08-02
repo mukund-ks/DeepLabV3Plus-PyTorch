@@ -4,7 +4,9 @@ import torch.nn.functional as F
 import torchvision.models as models
 from torchsummary import summary
 
-# TODO: Add L2 Regularization and Dropout
+# TODO:
+#   * Add Squeeze & Excitation Module
+#   * Add L2 Regularization
 
 
 class ASPPModule(nn.Module):
@@ -45,6 +47,8 @@ class ASPPModule(nn.Module):
 
         self.relu = nn.ReLU()
         
+        self.dropout = nn.Dropout(p=0.5)
+        
         # Upsampling by Bilinear Interpolation
         self.upsample = nn.UpsamplingBilinear2d(scale_factor=16)
 
@@ -60,9 +64,12 @@ class ASPPModule(nn.Module):
         self.final_conv = nn.Conv2d(out_channels * 5, out_channels, kernel_size=1, padding='same', bias=False)
 
     def forward(self, x):
+        # ASPP Forward Pass
+        
         # 1x1 Convolution
         x1 = self.conv1x1(x)
         x1 = self.batch_norm(x1)
+        x1 = self.dropout(x1)
         x1 = self.relu(x1)
 
         # Atrous Convolution - Rate: 6
@@ -93,6 +100,7 @@ class ASPPModule(nn.Module):
         # Final Convolution for ASPP Output
         aspp_output = self.final_conv(combined_output)
         aspp_output = self.batch_norm(aspp_output)
+        aspp_output = self.dropout(aspp_output)
         aspp_output = self.relu(aspp_output)
 
         return aspp_output
@@ -105,6 +113,7 @@ class DecoderModule(nn.Module):
         # Upsampling by Bilinear Interpolation
         self.upsample = nn.UpsamplingBilinear2d(scale_factor=4)
 
+        # 1x1 Convolution
         self.conv_low = nn.Conv2d(in_channels, 48, kernel_size=1, padding='same', bias=False)
 
         self.batch_norm = nn.BatchNorm2d(48)
@@ -112,22 +121,31 @@ class DecoderModule(nn.Module):
         self.batch_norm2 = nn.BatchNorm2d(out_channels)
 
         self.relu = nn.ReLU()
+        
+        self.dropout = nn.Dropout(p=0.5)
 
+        # 3x3 Convolution
         self.final_conv1 = nn.Conv2d(in_channels=304, out_channels=256, kernel_size=3, padding='same', bias=False)
-
+        
+        # 3x3 Convolution
         self.final_conv2 = nn.Conv2d(in_channels, out_channels, kernel_size=3, padding='same', bias=False)
 
     def forward(self, x_high, x_low):
+        # Decoder Forward Pass
+        
         # Upsampling High-Level Features
         x_high = self.upsample(x_high)
+        x_high = self.dropout(x_high)
 
         # 1x1 Convolution on Low-Level Features
         x_low = self.conv_low(x_low)
         x_low = self.batch_norm(x_low)
+        x_low = self.dropout(x_low)
         x_low = self.relu(x_low)
 
         # Concatenating High-Level and Low-Level Features
         x = torch.cat((x_high, x_low), dim=1)
+        x = self.dropout(x)
 
         # 3x3 Convolution on Concatenated Feature Map
         x = self.final_conv1(x)
@@ -152,6 +170,7 @@ class DeepLabV3Plus(nn.Module):
         in_channels = 1024
         out_channels = 256
 
+        # Dilation Rates
         dilations = [6, 12, 18]
 
         # ASPP Module
@@ -163,11 +182,15 @@ class DeepLabV3Plus(nn.Module):
         # Upsampling with Bilinear Interpolation
         self.upsample = nn.UpsamplingBilinear2d(scale_factor=4)
 
+        # Final 1x1 Convolution
         self.final_conv = nn.Conv2d(out_channels, num_classes, kernel_size=1)
         
+        # Sigmoid Activation for Binary-Seg
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
+        # DeepLabV3+ Forward Pass
+        
         # Getting Low-Level Features
         x_low = self.backbone[:-3](x)
 

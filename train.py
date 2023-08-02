@@ -13,12 +13,16 @@ data_dir = "./data_ews"
 input_size = (256, 256)
 batch_size = 4
 num_classes = 1
-learning_rate = 1e-4
-num_epochs = 80
+learning_rate = 1e-5
+num_epochs = 150
 
 train_transform = A.Compose(
     [
         A.Resize(input_size[0], input_size[1]),
+        A.Rotate(limit=(-10,10), p=0.7),
+        A.HorizontalFlip(p=0.5),
+        A.VerticalFlip(p=0.5),
+        A.RandomCrop(height=input_size[0], width=input_size[0], p=0.7),
         A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ToTensorV2(),
     ]
@@ -40,16 +44,16 @@ test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
 model = DeepLabV3Plus(num_classes=num_classes)
 
-criterion = DiceLoss()
-optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
+
+criterion = DiceLoss()
+
+optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
 scheduler = optim.lr_scheduler.ReduceLROnPlateau(
     optimizer, mode="min", patience=5, factor=0.1, verbose=True
 )
-
 
 csv_file = "training_logs.csv"
 csv_header = [
@@ -62,6 +66,7 @@ csv_header = [
     "Avg Pix Acc Val",
     "Avg Dice Coeff Train",
     "Avg Dice Coeff Val",
+    "Learning Rate"
 ]
 
 best_val_loss = float("inf")
@@ -81,6 +86,8 @@ with open(csv_file, "w", newline="") as f:
         train_dataloader = tqdm(
             train_dataloader, desc=f"Epoch {epoch + 1}/{num_epochs}", unit="batch"
         )
+        
+        current_lr = optimizer.param_groups[0]['lr']
 
         for images, masks in train_dataloader:
             images, masks = images.to(device), masks.to(device)
@@ -112,6 +119,7 @@ with open(csv_file, "w", newline="") as f:
                 train_iou=iou_train,
                 train_pix_acc=pixel_accuracy_train,
                 train_dice_coef=dice_coefficient_train,
+                lr = current_lr,
             )
 
         train_loss /= len(train_dataloader)
@@ -152,6 +160,7 @@ with open(csv_file, "w", newline="") as f:
                     val_iou=iou_val,
                     val_pix_acc=pixel_accuracy_val,
                     val_dice_coef=dice_coefficient_val,
+                    lr = current_lr,
                 )
 
         val_loss /= len(test_dataloader)
@@ -171,6 +180,7 @@ with open(csv_file, "w", newline="") as f:
             f"Avg Pix Acc Val: {avg_pixel_accuracy_val:.4f}\n"
             f"Avg Dice Coeff Train: {avg_dice_coefficient_train:.4f}\n"
             f"Avg Dice Coeff Val: {avg_dice_coefficient_val:.4f}\n"
+            f"Current LR: {current_lr}\n"
             f"{'-'*50}"
         )
 
@@ -195,5 +205,6 @@ with open(csv_file, "w", newline="") as f:
                 avg_pixel_accuracy_val,
                 avg_dice_coefficient_train,
                 avg_dice_coefficient_val,
+                current_lr
             ]
         )
