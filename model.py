@@ -161,7 +161,7 @@ class DecoderModule(nn.Module):
 
 
 class DeepLabV3Plus(nn.Module):
-    def __init__(self, num_classes, weight_decay):
+    def __init__(self, num_classes):
         super(DeepLabV3Plus, self).__init__()
 
         resnet = models.resnet50(weights=models.ResNet50_Weights.DEFAULT)

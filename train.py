@@ -42,7 +42,7 @@ test_dataset = CustomDataset(data_dir, transformations=test_transform, split="te
 train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
-model = DeepLabV3Plus(num_classes=num_classes, weight_decay=1e-8)
+model = DeepLabV3Plus(num_classes=num_classes)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
