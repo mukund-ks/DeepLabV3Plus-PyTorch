@@ -18,7 +18,7 @@ data_dir = "augmented_data_ews"
 input_size = (256, 256)
 batch_size = 4
 num_classes = 1
-learning_rate = 1e-3
+learning_rate = 1e-4
 num_epochs = 200
 
 train_transform = A.Compose(
@@ -63,6 +63,9 @@ optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-3)
 scheduler = optim.lr_scheduler.ReduceLROnPlateau(
     optimizer, mode="min", patience=5, factor=0.1, verbose=True
 )
+
+patience_epochs = 20
+no_improvement_epochs = 0
 
 csv_file = "training_logs.csv"
 csv_header = [
@@ -194,12 +197,14 @@ with open(csv_file, "w", newline="") as f:
         )
 
         if val_loss < best_val_loss:
+            no_improvement_epochs = 0
             print(f"\nval_loss improved from {best_val_loss:.4f} to {val_loss:.4f}\n")
             best_val_loss = val_loss
             torch.save(model.state_dict(), "best_model.pth")
             print("Saved Best Model!\n")
             print(f"{'-'*50}")
         else:
+            no_improvement_epochs += 1
             print(f"\nval_loss did not improve from {best_val_loss:.4f}\n")
             print(f"{'-'*50}")
 
@@ -218,3 +223,7 @@ with open(csv_file, "w", newline="") as f:
                 current_lr,
             ]
         )
+
+        if no_improvement_epochs >= patience_epochs:
+            print(f"\nEarly Stopping: val_loss did not improve for {patience_epochs} epochs.\n")
+            break
