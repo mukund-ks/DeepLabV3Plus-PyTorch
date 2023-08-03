@@ -9,8 +9,16 @@ from torch.utils.data import Dataset, DataLoader
 
 class CustomDataset(Dataset):
     def __init__(
-        self, data_dir, transformations=None, pre_split: bool = False, split=None, test_ratio=0.2
+        self,
+        data_dir: str = None,
+        transformations: A.Compose = None,
+        pre_split: bool = False,
+        split: str = "train",
+        test_ratio: int = 0.2,
     ):
+        if not os.path.exists(data_dir):
+            raise ValueError(f'Provided data_dir: "{data_dir}" does not exist.')
+
         self.data_dir = data_dir
         self.image_dir = os.path.join(data_dir, "Image")
         self.mask_dir = os.path.join(data_dir, "Mask")
@@ -18,13 +26,14 @@ class CustomDataset(Dataset):
         self.mask_filenames = sorted(glob(os.path.join(self.mask_dir, "*.png")))
         self.transformations = transformations
         self.split = split
+        self.pre_split = pre_split
         self.test_ratio = test_ratio
 
         num_samples = len(self.image_filenames)
 
         indices = list(range(num_samples))
 
-        if not pre_split:
+        if not self.pre_split:
             num_test_samples = int(self.test_ratio * num_samples)
             if self.split == "train":
                 self.indices = indices[:-num_test_samples]
@@ -67,7 +76,7 @@ class EvalDataset(Dataset):
         self.image_filenames = sorted(glob(os.path.join(self.image_dir, "*.png")))
         self.mask_filenames = sorted(glob(os.path.join(self.mask_dir, "*.png")))
         self.transformations = transformations
-        
+
     def __len__(self):
         return len(self.image_filenames)
 
