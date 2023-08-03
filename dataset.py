@@ -7,9 +7,6 @@ from PIL import Image
 from albumentations.pytorch import ToTensorV2
 from torch.utils.data import Dataset, DataLoader
 
-# TODO:
-#   * Add option to opt out of split.
-
 
 class CustomDataset(Dataset):
     def __init__(
