@@ -11,14 +11,16 @@ from torchsummary import summary
 class SEModule(nn.Module):
     def __init__(self, in_channels, out_channels, ratio=8) -> None:
         super(SEModule, self).__init__()
-        print(f"{in_channels},{out_channels}")
-
+        
+        # Average Pooling
         self.avgpool = nn.AvgPool2d(kernel_size=(64, 64))
 
+        # 1x1 Convolution
         self.conv1 = nn.Conv2d(
             in_channels=in_channels, out_channels=out_channels // ratio, kernel_size=1, bias=False
         )
 
+        # 1x1 Convolution
         self.conv2 = nn.Conv2d(
             in_channels=out_channels // ratio, out_channels=out_channels, kernel_size=1, bias=False
         )
@@ -28,16 +30,21 @@ class SEModule(nn.Module):
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
+        # Squeeze & Excite Forward Pass
         init = x
         
+        # Avg. Pooling
         se = self.avgpool(init)
 
+        # Convolution - 1 
         se = self.conv1(se)
         se = self.relu(se)
 
+        # Convolution - 2 
         se = self.conv2(se)
         se = self.sigmoid(se)
 
+        # Concat for output
         x = init * se
 
         return x
@@ -145,6 +152,7 @@ class DecoderModule(nn.Module):
     def __init__(self, in_channels, out_channels):
         super(DecoderModule, self).__init__()
 
+        # Squeeze and Excite Module
         self.squeeze_excite = SEModule(in_channels=304, out_channels=304)
         
         self.squeeze_excite2 = SEModule(in_channels=in_channels, out_channels=out_channels)
