@@ -10,7 +10,7 @@ from utils import save_overlay_image
 
 # TODO:
 #   * Refactor Code
-#   * Write main entry point
+#   * Write cli
 
 num_classes = 1
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -43,8 +43,8 @@ with torch.no_grad():
         outputs = model(images)
         prediction = outputs.cpu().numpy()[0, 0]
 
-        image_path = os.path.join(eval_dataset.image_dir, eval_dataset.image_filenames[i])
-        mask_path = os.path.join(eval_dataset.mask_dir, eval_dataset.mask_filenames[i])
+        image_path = eval_dataset.image_filenames[i]
+        mask_path = eval_dataset.mask_filenames[i]
 
         output_image_path = os.path.join(output_dir, f"output_{i + 1}.png")
 

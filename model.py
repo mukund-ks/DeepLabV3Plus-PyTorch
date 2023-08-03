@@ -11,7 +11,7 @@ from torchsummary import summary
 class SEModule(nn.Module):
     def __init__(self, in_channels, out_channels, ratio=8) -> None:
         super(SEModule, self).__init__()
-        
+
         # Average Pooling
         self.avgpool = nn.AvgPool2d(kernel_size=(64, 64))
 
@@ -32,15 +32,15 @@ class SEModule(nn.Module):
     def forward(self, x):
         # Squeeze & Excite Forward Pass
         init = x
-        
+
         # Avg. Pooling
         se = self.avgpool(init)
 
-        # Convolution - 1 
+        # Convolution - 1
         se = self.conv1(se)
         se = self.relu(se)
 
-        # Convolution - 2 
+        # Convolution - 2
         se = self.conv2(se)
         se = self.sigmoid(se)
 
@@ -48,6 +48,7 @@ class SEModule(nn.Module):
         x = init * se
 
         return x
+
 
 class ASPPModule(nn.Module):
     def __init__(self, in_channels, out_channels, dilations):
@@ -154,7 +155,7 @@ class DecoderModule(nn.Module):
 
         # Squeeze and Excite Module
         self.squeeze_excite = SEModule(in_channels=304, out_channels=304)
-        
+
         self.squeeze_excite2 = SEModule(in_channels=in_channels, out_channels=out_channels)
 
         # Upsampling by Bilinear Interpolation

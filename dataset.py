@@ -1,5 +1,4 @@
 import os
-import random
 import numpy as np
 import albumentations as A
 from glob import glob
@@ -68,13 +67,13 @@ class EvalDataset(Dataset):
         self.image_filenames = sorted(glob(os.path.join(self.image_dir, "*.png")))
         self.mask_filenames = sorted(glob(os.path.join(self.mask_dir, "*.png")))
         self.transformations = transformations
-
+        
     def __len__(self):
         return len(self.image_filenames)
 
     def __getitem__(self, idx):
-        img_name = os.path.join(self.image_dir, self.image_filenames[idx])
-        mask_name = os.path.join(self.mask_dir, self.mask_filenames[idx])
+        img_name = self.image_filenames[idx]
+        mask_name = self.mask_filenames[idx]
 
         image = np.array(Image.open(img_name).convert("RGB"), dtype=np.float32)
         mask = np.array(Image.open(mask_name).convert("L"), dtype=np.float32)

@@ -1,3 +1,4 @@
+import os
 import csv
 import albumentations as A
 import torch
@@ -11,9 +12,9 @@ from metrics import DiceLoss, calculate_metrics
 
 # TODO:
 #   * Refactor Code
-#   * write main entry point
+#   * write cli
 
-data_dir = "./data_ews"
+data_dir = "augmented_data_ews"
 input_size = (256, 256)
 batch_size = 4
 num_classes = 1
@@ -23,10 +24,10 @@ num_epochs = 200
 train_transform = A.Compose(
     [
         A.Resize(input_size[0], input_size[1]),
-        A.Rotate(limit=(-10, 10), p=0.7),
-        A.HorizontalFlip(p=0.5),
-        A.VerticalFlip(p=0.5),
-        A.RandomCrop(height=input_size[0], width=input_size[0], p=0.7),
+        # A.Rotate(limit=(-10, 10), p=0.7),
+        # A.HorizontalFlip(p=0.5),
+        # A.VerticalFlip(p=0.5),
+        # A.RandomCrop(height=input_size[0], width=input_size[0], p=0.7),
         A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ToTensorV2(),
     ]
@@ -40,8 +41,12 @@ test_transform = A.Compose(
     ]
 )
 
-train_dataset = CustomDataset(data_dir, transformations=train_transform, split="train")
-test_dataset = CustomDataset(data_dir, transformations=test_transform, split="test")
+train_dataset = CustomDataset(
+    data_dir=os.path.join(data_dir, "Train"), transformations=train_transform, pre_split=True
+)
+test_dataset = CustomDataset(
+    data_dir=os.path.join(data_dir, "Test"), transformations=test_transform, pre_split=True
+)
 
 train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
