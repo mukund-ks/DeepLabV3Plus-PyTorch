@@ -195,7 +195,8 @@ with open(csv_file, "w", newline="") as f:
             print("Saved Best Model!\n")
             print(f"{'-'*50}")
         else:
-            print(f"\nval_loss did not improve from {best_val_loss:.4f}")
+            print(f"\nval_loss did not improve from {best_val_loss:.4f}\n")
+            print(f"{'-'*50}")
 
         # Append the training and validation logs to the CSV file
         csv_writer.writerow(

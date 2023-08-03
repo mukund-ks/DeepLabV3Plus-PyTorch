@@ -6,6 +6,9 @@ from albumentations.pytorch import ToTensorV2
 import numpy as np
 from torch.utils.data import Dataset, DataLoader
 
+# TODO:
+#   * Add option to opt out of split.
+
 class CustomDataset(Dataset):
     def __init__(self, data_dir, transformations=None, split="train", test_ratio=0.2):
         self.data_dir = data_dir
