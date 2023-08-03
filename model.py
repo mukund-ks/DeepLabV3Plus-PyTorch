@@ -5,8 +5,42 @@ import torchvision.models as models
 from torchsummary import summary
 
 # TODO:
-#   * Add Squeeze & Excitation Module
+#   * Refactor Code
 
+
+class SEModule(nn.Module):
+    def __init__(self, in_channels, out_channels, ratio=8) -> None:
+        super(SEModule, self).__init__()
+        print(f"{in_channels},{out_channels}")
+
+        self.avgpool = nn.AvgPool2d(kernel_size=(64, 64))
+
+        self.conv1 = nn.Conv2d(
+            in_channels=in_channels, out_channels=out_channels // ratio, kernel_size=1, bias=False
+        )
+
+        self.conv2 = nn.Conv2d(
+            in_channels=out_channels // ratio, out_channels=out_channels, kernel_size=1, bias=False
+        )
+
+        self.relu = nn.ReLU()
+
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, x):
+        init = x
+        
+        se = self.avgpool(init)
+
+        se = self.conv1(se)
+        se = self.relu(se)
+
+        se = self.conv2(se)
+        se = self.sigmoid(se)
+
+        x = init * se
+
+        return x
 
 class ASPPModule(nn.Module):
     def __init__(self, in_channels, out_channels, dilations):
@@ -45,26 +79,28 @@ class ASPPModule(nn.Module):
         self.batch_norm = nn.BatchNorm2d(out_channels)
 
         self.relu = nn.ReLU()
-        
+
         self.dropout = nn.Dropout(p=0.5)
-        
+
         # Upsampling by Bilinear Interpolation
         self.upsample = nn.UpsamplingBilinear2d(scale_factor=16)
 
         # Global Average Pooling
         self.avgpool = nn.AvgPool2d(kernel_size=(16, 16))
 
-        # 1x1 Convolution 
+        # 1x1 Convolution
         self.conv1x1 = nn.Conv2d(
             in_channels, out_channels, kernel_size=1, padding="same", bias=False
         )
 
-        # Final 1x1 Convolution 
-        self.final_conv = nn.Conv2d(out_channels * 5, out_channels, kernel_size=1, padding='same', bias=False)
+        # Final 1x1 Convolution
+        self.final_conv = nn.Conv2d(
+            out_channels * 5, out_channels, kernel_size=1, padding="same", bias=False
+        )
 
     def forward(self, x):
         # ASPP Forward Pass
-        
+
         # 1x1 Convolution
         x1 = self.conv1x1(x)
         x1 = self.batch_norm(x1)
@@ -108,30 +144,38 @@ class ASPPModule(nn.Module):
 class DecoderModule(nn.Module):
     def __init__(self, in_channels, out_channels):
         super(DecoderModule, self).__init__()
+
+        self.squeeze_excite = SEModule(in_channels=304, out_channels=304)
         
+        self.squeeze_excite2 = SEModule(in_channels=in_channels, out_channels=out_channels)
+
         # Upsampling by Bilinear Interpolation
         self.upsample = nn.UpsamplingBilinear2d(scale_factor=4)
 
         # 1x1 Convolution
-        self.conv_low = nn.Conv2d(in_channels, 48, kernel_size=1, padding='same', bias=False)
+        self.conv_low = nn.Conv2d(in_channels, 48, kernel_size=1, padding="same", bias=False)
 
         self.batch_norm = nn.BatchNorm2d(48)
-        
+
         self.batch_norm2 = nn.BatchNorm2d(out_channels)
 
         self.relu = nn.ReLU()
-        
+
         self.dropout = nn.Dropout(p=0.5)
 
         # 3x3 Convolution
-        self.final_conv1 = nn.Conv2d(in_channels=304, out_channels=256, kernel_size=3, padding='same', bias=False)
-        
+        self.final_conv1 = nn.Conv2d(
+            in_channels=304, out_channels=256, kernel_size=3, padding="same", bias=False
+        )
+
         # 3x3 Convolution
-        self.final_conv2 = nn.Conv2d(in_channels, out_channels, kernel_size=3, padding='same', bias=False)
+        self.final_conv2 = nn.Conv2d(
+            in_channels, out_channels, kernel_size=3, padding="same", bias=False
+        )
 
     def forward(self, x_high, x_low):
         # Decoder Forward Pass
-        
+
         # Upsampling High-Level Features
         x_high = self.upsample(x_high)
         # x_high = self.dropout(x_high)
@@ -144,17 +188,20 @@ class DecoderModule(nn.Module):
 
         # Concatenating High-Level and Low-Level Features
         x = torch.cat((x_high, x_low), dim=1)
+        x = self.squeeze_excite(x)
         # x = self.dropout(x)
 
         # 3x3 Convolution on Concatenated Feature Map
         x = self.final_conv1(x)
         x = self.batch_norm2(x)
-        x = self.relu(x)        
+        x = self.relu(x)
+        x = self.squeeze_excite2(x)
 
         # 3x3 Convolution on Concatenated Feature Map
         x = self.final_conv2(x)
         x = self.batch_norm2(x)
         x = self.relu(x)
+        x = self.squeeze_excite2(x)
 
         return x
 
@@ -164,9 +211,9 @@ class DeepLabV3Plus(nn.Module):
         super(DeepLabV3Plus, self).__init__()
 
         resnet = models.resnet50(weights=models.ResNet50_Weights.DEFAULT)
-        
+
         self.backbone = nn.Sequential(*list(resnet.children())[:-2])
-        
+
         in_channels = 1024
         out_channels = 256
 
@@ -184,13 +231,13 @@ class DeepLabV3Plus(nn.Module):
 
         # Final 1x1 Convolution
         self.final_conv = nn.Conv2d(out_channels, num_classes, kernel_size=1)
-        
+
         # Sigmoid Activation for Binary-Seg
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
         # DeepLabV3+ Forward Pass
-        
+
         # Getting Low-Level Features
         x_low = self.backbone[:-3](x)
 
