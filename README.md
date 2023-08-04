@@ -223,6 +223,9 @@ $ tree -L 3
     └── Mask
 ```
 * The structure of `eval_data` remains the same in both cases, holding `Image` and `Mask` sub-directories.
+
+> **Note**
+> The directory names are case-sensitive.
 ## Roadmap
 
 See the [open issues](https://github.com/mukund-ks/DeepLabV3Plus-PyTorch/issues) for a list of proposed features (and known issues).
