@@ -36,9 +36,9 @@ CLASSES = 1  # Binary Segmentation
 @click.option(
     "-p",
     "--pre-split",
+    required=True,
     type=bool,
-    default=False,
-    help="Opt-in to split data into Training and Validaton set. Default - False",
+    help="Opt-in to split data into Training and Validaton set."
 )
 @click.option(
     "-a",
