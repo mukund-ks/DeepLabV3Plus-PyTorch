@@ -68,7 +68,7 @@ The ultimate objective of the project is to develop a strong model that can accu
 To get a local copy of this project up and running on your machine, follow these simple steps.
 
 * Clone a copy of this Repository on your machine.
-```sh
+```console
 git clone https://github.com/mukund-ks/DeepLabV3Plus-PyTorch.git
 ```
 
@@ -76,7 +76,7 @@ git clone https://github.com/mukund-ks/DeepLabV3Plus-PyTorch.git
 
 You'll need to have a machine with python 3.9 or greater installed.
 
-```sh
+```console
 python -V
 Python 3.9.13
 ```
@@ -84,24 +84,24 @@ Python 3.9.13
 ### Installation
 
 1. Move into the cloned repo.
-```sh
+```console
 cd DeepLabV3Plus-PyTorch
 ```
 
 2. Setup a Virutal Environment
 
-```sh
+```console
 python -m venv env
 ```
 
 3. Activate the Virutal Environment
-```sh
+```console
 env/Scripts/activate
 ```
 
 4. Install Dependencies
 
-```sh
+```console
 pip install -r requirements.txt
 ```
 
@@ -115,10 +115,10 @@ pip install -r requirements.txt
 You can train on the data aforementioned in the [**About**](#about-the-project) section or use your own data.
 
 * To train the model, use [`train.py`](https://github.com/mukund-ks/DeepLabV3Plus-PyTorch/blob/main/train.py)
-```sh
+```console
 python train.py --help
 ```
-```sh
+```console
 Usage: train.py [OPTIONS]
 
   Training Script for DeepLabV3+ with ResNet50 Encoder for Binary
@@ -144,10 +144,10 @@ Options:
 ```
 
 * For Evaluation, use [`evaluation.py`](https://github.com/mukund-ks/DeepLabV3Plus-PyTorch/blob/main/evaluation.py)
-```sh
+```console
 python evaluation.py --help
 ```
-```sh
+```console
 Usage: evaluation.py [OPTIONS]
 
   Evaluation Script for DeepLabV3+ with ResNet50 Encoder for Binary
@@ -178,7 +178,8 @@ The folder structure will alter slightly depending on whether or not your traini
 > **Note**
 > [`dataset.py`](https://github.com/mukund-ks/DeepLabV3Plus-PyTorch/blob/main/dataset.py) file will split the data into training and testing set with a ratio of 0.2
 
-```
+```console
+$ tree -L 2
 .
 ├── data
 │   ├── Image
@@ -194,7 +195,8 @@ The folder structure will alter slightly depending on whether or not your traini
   
     Example: ```python train.py --data-dir data --pre-split True```
 
-```
+```console
+$ tree -L 3
 .
 ├── data
 │   ├── Test
@@ -230,7 +232,7 @@ Contributions are what make the open source community such an amazing place to b
 
 ## License
 
-Distributed under the Apache 2.0 License. See [LICENSE](https://github.com/mukund-ks/DeepLabV3Plus-PyTorch/blob/main/LICENSE.md) for more information.
+Distributed under the Apache 2.0 License. See [LICENSE](https://github.com/mukund-ks/DeepLabV3Plus-PyTorch/blob/main/LICENSE) for more information.
 
 ## Authors
 
