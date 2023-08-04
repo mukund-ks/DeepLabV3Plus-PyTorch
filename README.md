@@ -125,7 +125,7 @@ pip install -r requirements.txt
 
 ## Usage
 
-You can train on the data aforementioned in the [**About**](#about-the-project) section or use your own data.
+The Model can be trained on the data aforementioned in the [**About**](#about-the-project) section or on your own data.
 
 * To train the model, use [`train.py`](https://github.com/mukund-ks/DeepLabV3Plus-PyTorch/blob/main/train.py)
 ```console
@@ -189,7 +189,7 @@ The folder structure will alter slightly depending on whether or not your traini
     Example: ```python train.py --data-dir data --pre-split False```
 
 > **Note**
-> [`dataset.py`](https://github.com/mukund-ks/DeepLabV3Plus-PyTorch/blob/main/dataset.py) file will split the data into training and testing set with a ratio of 0.2
+> [`dataset.py`](https://github.com/mukund-ks/DeepLabV3Plus-PyTorch/blob/main/dataset.py) will split the data into training and testing set with a ratio of 0.2
 
 ```console
 $ tree -L 2
