@@ -76,11 +76,22 @@ git clone https://github.com/mukund-ks/DeepLabV3Plus-PyTorch.git
 
 ### Prerequisites
 
-You'll need to have a machine with python 3.9 or greater installed.
+* Python 3.9 or above.
 
 ```console
 python -V
 Python 3.9.13
+```
+
+* CUDA 11.2 or above.
+
+```console
+nvcc -V
+nvcc: NVIDIA (R) Cuda compiler driver
+Copyright (c) 2005-2021 NVIDIA Corporation
+Built on Sun_Feb_14_22:08:44_Pacific_Standard_Time_2021
+Cuda compilation tools, release 11.2, V11.2.152
+Build cuda_11.2.r11.2/compiler.29618528_0
 ```
 
 ### Installation
