@@ -1,13 +1,15 @@
 import torch
 import torch.nn as nn
+from typing import Any
 
 SMOOTH = 1e-8
 
+
 class DiceLoss(nn.Module):
-    def __init__(self):
+    def __init__(self) -> None:
         super(DiceLoss, self).__init__()
 
-    def forward(self, pred_mask, true_mask):
+    def forward(self, pred_mask: Any, true_mask: Any) -> torch.Tensor:
         intersection = torch.sum(pred_mask * true_mask)
         union = torch.sum(pred_mask) + torch.sum(true_mask)
 
@@ -16,7 +18,7 @@ class DiceLoss(nn.Module):
         return dice_loss
 
 
-def calculate_metrics(pred_mask, true_mask):
+def calculate_metrics(pred_mask: Any, true_mask: Any) -> torch.Tensor:
     pred_mask = (pred_mask > 0.5).float()
     true_mask = true_mask.float()
 

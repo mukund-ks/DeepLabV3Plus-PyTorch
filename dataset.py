@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import albumentations as A
+from typing import Any
 from glob import glob
 from PIL import Image
 from albumentations.pytorch import ToTensorV2
@@ -15,7 +16,7 @@ class CustomDataset(Dataset):
         pre_split: bool = False,
         split: str = "train",
         test_ratio: int = 0.2,
-    ):
+    ) -> None:
         if not os.path.exists(data_dir):
             raise ValueError(f'Provided data_dir: "{data_dir}" does not exist.')
 
@@ -44,10 +45,10 @@ class CustomDataset(Dataset):
         else:
             self.indices = indices
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.indices)
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx: Any) -> Any:
         img_idx = self.indices[idx]
         img_name = self.image_filenames[img_idx]
         mask_name = self.mask_filenames[img_idx]
@@ -69,7 +70,10 @@ class CustomDataset(Dataset):
 
 
 class EvalDataset(Dataset):
-    def __init__(self, data_dir, transformations=None):
+    def __init__(self, data_dir: str, transformations: A.Compose = None) -> None:
+        if not os.path.exists(data_dir):
+            return ValueError(f'Provided data_dir: "{data_dir}" does not exist.')
+
         self.data_dir = data_dir
         self.image_dir = os.path.join(data_dir, "Image")
         self.mask_dir = os.path.join(data_dir, "Mask")
@@ -77,10 +81,10 @@ class EvalDataset(Dataset):
         self.mask_filenames = sorted(glob(os.path.join(self.mask_dir, "*.png")))
         self.transformations = transformations
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.image_filenames)
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx: Any) -> Any:
         img_name = self.image_filenames[idx]
         mask_name = self.mask_filenames[idx]
 

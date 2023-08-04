@@ -3,13 +3,14 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torchvision.models as models
 from torchsummary import summary
+from typing import Any
 
 # TODO:
 #   * Refactor Code
 
 
 class SEModule(nn.Module):
-    def __init__(self, in_channels, out_channels, ratio=8) -> None:
+    def __init__(self, in_channels: int, out_channels: int, ratio: int = 8) -> None:
         super(SEModule, self).__init__()
 
         # Average Pooling
@@ -29,7 +30,7 @@ class SEModule(nn.Module):
 
         self.sigmoid = nn.Sigmoid()
 
-    def forward(self, x):
+    def forward(self, x: Any) -> Any:
         # Squeeze & Excite Forward Pass
         init = x
 
@@ -51,7 +52,7 @@ class SEModule(nn.Module):
 
 
 class ASPPModule(nn.Module):
-    def __init__(self, in_channels, out_channels, dilations):
+    def __init__(self, in_channels: int, out_channels: int, dilations: list[int]) -> None:
         super(ASPPModule, self).__init__()
 
         # Atrous Convolution 1
@@ -106,7 +107,7 @@ class ASPPModule(nn.Module):
             out_channels * 5, out_channels, kernel_size=1, padding="same", bias=False
         )
 
-    def forward(self, x):
+    def forward(self, x: Any) -> Any:
         # ASPP Forward Pass
 
         # 1x1 Convolution
@@ -150,7 +151,7 @@ class ASPPModule(nn.Module):
 
 
 class DecoderModule(nn.Module):
-    def __init__(self, in_channels, out_channels):
+    def __init__(self, in_channels: int, out_channels: int) -> None:
         super(DecoderModule, self).__init__()
 
         # Squeeze and Excite Module
@@ -182,7 +183,7 @@ class DecoderModule(nn.Module):
             in_channels, out_channels, kernel_size=3, padding="same", bias=False
         )
 
-    def forward(self, x_high, x_low):
+    def forward(self, x_high: Any, x_low: Any) -> Any:
         # Decoder Forward Pass
 
         # Upsampling High-Level Features
@@ -216,7 +217,7 @@ class DecoderModule(nn.Module):
 
 
 class DeepLabV3Plus(nn.Module):
-    def __init__(self, num_classes):
+    def __init__(self, num_classes: int = 1) -> None:
         super(DeepLabV3Plus, self).__init__()
 
         resnet = models.resnet50(weights=models.ResNet50_Weights.DEFAULT)
@@ -244,7 +245,7 @@ class DeepLabV3Plus(nn.Module):
         # Sigmoid Activation for Binary-Seg
         self.sigmoid = nn.Sigmoid()
 
-    def forward(self, x):
+    def forward(self, x: Any) -> Any:
         # DeepLabV3+ Forward Pass
 
         # Getting Low-Level Features
@@ -283,4 +284,4 @@ if __name__ == "__main__":
     # Forward pass
     output = model(random_input)
     print("Output shape:", output.shape)
-    # summary(model, input_size=(3, 256, 256))
+    summary(model, input_size=(3, 256, 256))
