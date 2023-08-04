@@ -56,6 +56,9 @@ def main(data_dir: str, num_epochs: int, batch_size: int, pre_split: bool, augme
     Refer to the Options below for usage.
     """
     click.secho(message="🚀 Training...", fg="blue", nl=True)
+
+    os.makedirs("output", exist_ok=True)
+
     train_transform_list = [
         A.Resize(INPUT[0], INPUT[1]),
         A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
@@ -106,6 +109,7 @@ def main(data_dir: str, num_epochs: int, batch_size: int, pre_split: bool, augme
                 data_dir=data_dir, transformations=train_transform, split="test"
             )
     except Exception as _:
+        click.secho(message="❗Error:", fg="red")
         traceback.print_exc()
 
     train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
@@ -127,7 +131,7 @@ def main(data_dir: str, num_epochs: int, batch_size: int, pre_split: bool, augme
     patience_epochs = 20
     no_improvement_epochs = 0
 
-    csv_file = "training_logs.csv"
+    csv_file = os.path.abspath("output/training_logs.csv")
     csv_header = [
         "Epoch",
         "Avg Train Loss",
@@ -263,7 +267,7 @@ def main(data_dir: str, num_epochs: int, batch_size: int, pre_split: bool, augme
                     fg="green",
                 )
                 best_val_loss = val_loss
-                torch.save(model.state_dict(), "best_model.pth")
+                torch.save(model.state_dict(), "./output/best_model.pth")
                 click.secho(message="Saved Best Model! 🙌\n", fg="green")
                 print(f"{'-'*50}")
             else:
