@@ -26,11 +26,9 @@ class SEModule(nn.Module):
     def forward(self, x: Any) -> Any:
         # Squeeze & Excite Forward Pass
         b, c, _, _ = x.size()
-        print(b, c)
 
         y = self.avgpool(x).view(b, c)
         y = self.fc(y).view(b, c, 1, 1)
-        print(f"y shape: {y.shape}")
 
         return x * y
 

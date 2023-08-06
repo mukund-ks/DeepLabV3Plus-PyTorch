@@ -85,9 +85,9 @@ def main(data_dir: str, num_epochs: int, batch_size: int, pre_split: bool, augme
     else:
         pass
 
-    train_transform = A.Compose(transforms=train_transform_list)
+    train_transform = A.Compose(transforms=train_transform_list, is_check_shapes=False)
 
-    test_transform = A.Compose(transforms=test_transform_list)
+    test_transform = A.Compose(transforms=test_transform_list, is_check_shapes=False)
 
     try:
         if pre_split:
@@ -147,9 +147,8 @@ def main(data_dir: str, num_epochs: int, batch_size: int, pre_split: bool, augme
 
     best_val_loss = float("inf")
 
-    click.secho(
-        message=f"\nTrain Size: {train_dataset.__len__()}\tTest Size: {test_dataset.__len__()}\n",
-        fg="blue",
+    click.echo(
+        f"\n{click.style(text=f'Train Size: ', fg='blue')}{train_dataset.__len__()}\t{click.style(text=f'Test Size: ', fg='blue')}{test_dataset.__len__()}\n"
     )
 
     with open(csv_file, "w", newline="") as f:
