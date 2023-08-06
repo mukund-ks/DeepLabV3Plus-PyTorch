@@ -10,45 +10,29 @@ from typing import Any
 
 
 class SEModule(nn.Module):
-    def __init__(self, in_channels: int, out_channels: int, ratio: int = 8) -> None:
+    def __init__(self, channels: int, ratio: int = 8) -> None:
         super(SEModule, self).__init__()
 
         # Average Pooling
-        self.avgpool = nn.AvgPool2d(kernel_size=(64, 64))
+        self.avgpool = nn.AdaptiveAvgPool2d(1)
 
-        # 1x1 Convolution
-        self.conv1 = nn.Conv2d(
-            in_channels=in_channels, out_channels=out_channels // ratio, kernel_size=1, bias=False
+        self.fc = nn.Sequential(
+            nn.Linear(channels, channels // ratio),
+            nn.ReLU(inplace=True),
+            nn.Linear(channels // ratio, channels),
+            nn.Sigmoid(),
         )
-
-        # 1x1 Convolution
-        self.conv2 = nn.Conv2d(
-            in_channels=out_channels // ratio, out_channels=out_channels, kernel_size=1, bias=False
-        )
-
-        self.relu = nn.ReLU()
-
-        self.sigmoid = nn.Sigmoid()
 
     def forward(self, x: Any) -> Any:
         # Squeeze & Excite Forward Pass
-        init = x
+        b, c, _, _ = x.size()
+        print(b, c)
 
-        # Avg. Pooling
-        se = self.avgpool(init)
+        y = self.avgpool(x).view(b, c)
+        y = self.fc(y).view(b, c, 1, 1)
+        print(f"y shape: {y.shape}")
 
-        # Convolution - 1
-        se = self.conv1(se)
-        se = self.relu(se)
-
-        # Convolution - 2
-        se = self.conv2(se)
-        se = self.sigmoid(se)
-
-        # Concat for output
-        x = init * se
-
-        return x
+        return x * y
 
 
 class ASPPModule(nn.Module):
@@ -155,9 +139,9 @@ class DecoderModule(nn.Module):
         super(DecoderModule, self).__init__()
 
         # Squeeze and Excite Module
-        self.squeeze_excite = SEModule(in_channels=304, out_channels=304)
+        self.squeeze_excite = SEModule(channels=304)
 
-        self.squeeze_excite2 = SEModule(in_channels=in_channels, out_channels=out_channels)
+        self.squeeze_excite2 = SEModule(channels=out_channels)
 
         # Upsampling by Bilinear Interpolation
         self.upsample = nn.UpsamplingBilinear2d(scale_factor=4)

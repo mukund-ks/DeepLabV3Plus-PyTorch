@@ -1,7 +1,11 @@
 __pycache__
 data_ews/
+data_cvppp/
+data_pss/
 env/
 eval_ews/
+eval_cvppp/
+eval_pss/
 augmented_data_ews/
 eval_output/
 output/

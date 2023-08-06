@@ -38,7 +38,7 @@ CLASSES = 1  # Binary Segmentation
     "--pre-split",
     required=True,
     type=bool,
-    help="Opt-in to split data into Training and Validaton set."
+    help="Opt-in to split data into Training and Validaton set.",
 )
 @click.option(
     "-a",
@@ -146,6 +146,11 @@ def main(data_dir: str, num_epochs: int, batch_size: int, pre_split: bool, augme
     ]
 
     best_val_loss = float("inf")
+
+    click.secho(
+        message=f"\nTrain Size: {train_dataset.__len__()}\tTest Size: {test_dataset.__len__()}\n",
+        fg="blue",
+    )
 
     with open(csv_file, "w", newline="") as f:
         csv_writer = csv.writer(f)
