@@ -13,7 +13,7 @@ from model import DeepLabV3Plus
 from metrics import DiceLoss, calculate_metrics
 
 INPUT = (256, 256)
-LR = 1e-5
+LR = 5e-4
 CLASSES = 1  # Binary Segmentation
 
 
@@ -129,6 +129,7 @@ def main(
     train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
+    # Defining Model
     model = DeepLabV3Plus(num_classes=CLASSES)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -142,9 +143,11 @@ def main(
         optimizer, mode="min", patience=5, factor=0.1, verbose=True
     )
 
+    # For Early-Stopping
     patience_epochs = 20
     no_improvement_epochs = 0
 
+    # Logging
     csv_file = os.path.abspath("output/training_logs.csv")
     csv_header = [
         "Epoch",
@@ -159,12 +162,14 @@ def main(
         "Learning Rate",
     ]
 
+    # For saving best model
     best_val_loss = float("inf")
 
     click.echo(
         f"\n{click.style(text=f'Train Size: ', fg='blue')}{train_dataset.__len__()}\t{click.style(text=f'Test Size: ', fg='blue')}{test_dataset.__len__()}\n"
     )
 
+    # Main loop
     with open(csv_file, "w", newline="") as f:
         csv_writer = csv.writer(f)
         csv_writer.writerow(csv_header)
@@ -278,6 +283,7 @@ def main(
                 f"{'-'*50}"
             )
 
+            # Saving best model
             if val_loss < best_val_loss:
                 no_improvement_epochs = 0
                 click.secho(
@@ -311,6 +317,7 @@ def main(
                 ]
             )
 
+            # Early-Stopping
             if early_stop:    
                 if no_improvement_epochs >= patience_epochs:
                     click.secho(
