@@ -30,6 +30,7 @@
 - [License](#license)
 - [Authors](#authors)
 - [Acknowledgements](#acknowledgements)
+- [To Cite this Repository](#to-cite-this-repository)
 
 ## About The Project
 
@@ -291,3 +292,9 @@ Distributed under the Apache 2.0 License. See [LICENSE](https://github.com/mukun
 * [EWS Dataset](https://doi.org/10.3389/fpls.2021.774068)
 * [Plant Phenotyping Dataset](https://www.plant-phenotyping.org/datasets)
 * [Plant Semantic Segmentation Dataset by HIL](https://humansintheloop.org/resources/datasets/plant-segmentation/)
+
+
+## To Cite this Repository
+
+
+M. K. (2023, August 6). GitHub - mukund-ks/DeepLabV3Plus-PyTorch: _A DeepLab V3+ Model with ResNet 50 Encoder to perform Binary Segmentation Tasks. Implemented with PyTorch_. Retrieved from https://github.com/mukund-ks/DeepLabV3Plus-PyTorch
