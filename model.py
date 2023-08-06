@@ -96,7 +96,7 @@ class ASPPModule(nn.Module):
         # 1x1 Convolution
         x1 = self.conv1x1(x)
         x1 = self.batch_norm(x1)
-        # x1 = self.dropout(x1)
+        x1 = self.dropout(x1)
         x1 = self.relu(x1)
 
         # Atrous Convolution - Rate: 6
@@ -127,7 +127,7 @@ class ASPPModule(nn.Module):
         # Final 1x1 Convolution for ASPP Output
         aspp_output = self.final_conv(combined_output)
         aspp_output = self.batch_norm(aspp_output)
-        # aspp_output = self.dropout(aspp_output)
+        aspp_output = self.dropout(aspp_output)
         aspp_output = self.relu(aspp_output)
 
         return aspp_output
@@ -176,13 +176,13 @@ class DecoderModule(nn.Module):
         # 1x1 Convolution on Low-Level Features
         x_low = self.conv_low(x_low)
         x_low = self.batch_norm(x_low)
-        # x_low = self.dropout(x_low)
+        x_low = self.dropout(x_low)
         x_low = self.relu(x_low)
 
         # Concatenating High-Level and Low-Level Features
         x = torch.cat((x_high, x_low), dim=1)
         x = self.squeeze_excite(x)
-        # x = self.dropout(x)
+        x = self.dropout(x)
 
         # 3x3 Convolution on Concatenated Feature Map
         x = self.final_conv1(x)

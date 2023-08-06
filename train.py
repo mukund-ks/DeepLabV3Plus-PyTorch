@@ -13,7 +13,7 @@ from model import DeepLabV3Plus
 from metrics import DiceLoss, calculate_metrics
 
 INPUT = (256, 256)
-LR = 1e-4
+LR = 1e-5
 CLASSES = 1  # Binary Segmentation
 
 
@@ -136,7 +136,7 @@ def main(
 
     criterion = DiceLoss()
 
-    optimizer = optim.Adam(model.parameters(), lr=LR, weight_decay=1e-3)
+    optimizer = optim.Adam(model.parameters(), lr=LR, weight_decay=1e-8)
 
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(
         optimizer, mode="min", patience=5, factor=0.1, verbose=True
