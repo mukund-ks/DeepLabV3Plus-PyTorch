@@ -51,6 +51,8 @@ def main(data_dir: str) -> None:
     except Exception as _:
         click.secho(message="❗Error:", fg="red")
         traceback.print_exc()
+        
+    click.echo(message=f"\n{click.style('Evaluation Size: ')}{eval_dataset.__len__()}\n")
 
     with torch.no_grad():
         for i, (image, _) in enumerate(eval_dataloader):
