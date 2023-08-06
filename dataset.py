@@ -20,6 +20,8 @@ class CustomDataset(Dataset):
         if not os.path.exists(data_dir):
             raise ValueError(f'Provided data_dir: "{data_dir}" does not exist.')
 
+        np.random.seed(42)
+        
         self.data_dir = data_dir
         self.image_dir = os.path.join(data_dir, "Image")
         self.mask_dir = os.path.join(data_dir, "Mask")
@@ -35,6 +37,7 @@ class CustomDataset(Dataset):
         indices = list(range(num_samples))
 
         if not self.pre_split:
+            np.random.shuffle(indices)
             num_test_samples = int(self.test_ratio * num_samples)
             if self.split == "train":
                 self.indices = indices[:-num_test_samples]
