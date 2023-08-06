@@ -47,12 +47,11 @@ def main(data_dir: str) -> None:
     try:
         eval_dataset = EvalDataset(data_dir=data_dir, transformations=eval_transform)
         eval_dataloader = DataLoader(eval_dataset, batch_size=1, shuffle=False)
+        click.echo(message=f"\n{click.style('Evaluation Size: ', fg='blue')}{eval_dataset.__len__()}\n")
         eval_dataloader = tqdm(eval_dataloader, desc="Evaluation", unit="image")
     except Exception as _:
         click.secho(message="❗Error:", fg="red")
         traceback.print_exc()
-        
-    click.echo(message=f"\n{click.style('Evaluation Size: ')}{eval_dataset.__len__()}\n")
 
     with torch.no_grad():
         for i, (image, _) in enumerate(eval_dataloader):
