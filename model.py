@@ -13,9 +13,10 @@ class SEModule(nn.Module):
     def __init__(self, channels: int, ratio: int = 8) -> None:
         super(SEModule, self).__init__()
 
-        # Average Pooling
+        # Average Pooling for Squeeze
         self.avgpool = nn.AdaptiveAvgPool2d(1)
 
+        # Excitation Operation
         self.fc = nn.Sequential(
             nn.Linear(channels, channels // ratio),
             nn.ReLU(inplace=True),

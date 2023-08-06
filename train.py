@@ -47,7 +47,21 @@ CLASSES = 1  # Binary Segmentation
     default=True,
     help="Opt-in to apply augmentations to training set. Default - True",
 )
-def main(data_dir: str, num_epochs: int, batch_size: int, pre_split: bool, augment: bool) -> None:
+@click.option(
+    "-s",
+    "--early-stop",
+    type=bool,
+    default=True,
+    help="Stop training if val_loss hasn't improved for a certain no. of epochs. Default - True",
+)
+def main(
+    data_dir: str,
+    num_epochs: int,
+    batch_size: int,
+    pre_split: bool,
+    augment: bool,
+    early_stop: bool,
+) -> None:
     """
     Training Script for DeepLabV3+ with ResNet50 Encoder for Binary Segmentation.\n
     Please make sure your data is structured according to the folder structure specified in the Github Repository.\n
@@ -297,12 +311,13 @@ def main(data_dir: str, num_epochs: int, batch_size: int, pre_split: bool, augme
                 ]
             )
 
-            if no_improvement_epochs >= patience_epochs:
-                click.secho(
-                    message=f"\nEarly Stopping: val_loss did not improve for {patience_epochs} epochs.\n",
-                    fg="red",
-                )
-                break
+            if early_stop:    
+                if no_improvement_epochs >= patience_epochs:
+                    click.secho(
+                        message=f"\nEarly Stopping: val_loss did not improve for {patience_epochs} epochs.\n",
+                        fg="red",
+                    )
+                    break
 
     click.secho(message="🎉 Training Done!", fg="blue", nl=True)
 
