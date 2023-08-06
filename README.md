@@ -145,14 +145,16 @@ Usage: train.py [OPTIONS]
   Refer to the Options below for usage.
 
 Options:
-  -d, --data-dir TEXT       Path for Data Directory  [required]
+  -d, --data-dir TEXT       Path for Data Directory.  [required]
   -e, --num-epochs INTEGER  Number of epochs to train the model for. Default -
                             25
   -b, --batch-size INTEGER  Batch size of data for training. Default - 4
   -p, --pre-split BOOLEAN   Opt-in to split data into Training and Validaton
-                            set. Default - False
+                            set.  [required]
   -a, --augment BOOLEAN     Opt-in to apply augmentations to training set.
                             Default - True
+  -s, --early-stop BOOLEAN  Stop training if val_loss hasn't improved for a
+                            certain no. of epochs. Default - True
   --help                    Show this message and exit.
 ```
 
@@ -176,6 +178,13 @@ Usage: evaluation.py [OPTIONS]
 Options:
   -d, --data-dir TEXT  Path for Data Directory  [required]
   --help               Show this message and exit.
+```
+* An Example
+```console
+python train.py --data-dir data --num-epochs 80 --pre-split False --early-stop False
+```
+```console
+python evaluation.py --data-dir eval_data
 ```
 
 ## Folder Structure
