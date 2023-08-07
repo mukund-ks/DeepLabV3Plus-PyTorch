@@ -41,7 +41,7 @@ Plant pictures with ground truth binary mask labels make up the training and val
 
 [^1]: A Tensorflow implementation can be found [here](https://github.com/mukund-ks/DeepLabV3-Segmentation). 
 
-_A list of datasets used for this project is given below:_
+_Datasets used during development of this project are given below:_
 * [EWS Dataset](https://www.research-collection.ethz.ch/handle/20.500.11850/512332)
 
 * [Plant Semantic Segmentation Dataset by HIL](https://humansintheloop.org/resources/datasets/plant-segmentation/)
