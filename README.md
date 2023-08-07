@@ -298,4 +298,4 @@ Distributed under the Apache 2.0 License. See [LICENSE](https://github.com/mukun
 ## To Cite this Repository
 
 
-Surehli, M. K. (2023, August 6). GitHub - mukund-ks/DeepLabV3Plus-PyTorch: _A DeepLab V3+ Model with ResNet 50 Encoder to perform Binary Segmentation Tasks. Implemented with PyTorch._ Retrieved August 6, 2023, from https://github.com/mukund-ks/DeepLabV3Plus-PyTorch
+Surehli, M. K., & Aggarwal, N. (2023, August 6). GitHub - mukund-ks/DeepLabV3Plus-PyTorch: _A DeepLab V3+ Model with ResNet 50 Encoder to perform Binary Segmentation Tasks. Implemented with PyTorch._ Retrieved August 6, 2023, from https://github.com/mukund-ks/DeepLabV3Plus-PyTorch
