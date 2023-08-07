@@ -1,5 +1,6 @@
 import os
 import csv
+import sys
 import click
 import traceback
 import albumentations as A
@@ -125,7 +126,7 @@ def main(
     except Exception as _:
         click.secho(message="\n❗ Error \n", fg="red")
         click.secho(message=traceback.format_exc(), fg="yellow")
-        return
+        sys.exit("Non-Existent Data Dir")
 
     train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
     test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=2)

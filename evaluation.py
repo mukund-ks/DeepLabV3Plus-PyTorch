@@ -1,4 +1,5 @@
 import os
+import sys
 import torch
 import click
 import traceback
@@ -52,7 +53,7 @@ def main(data_dir: str) -> None:
     except Exception as _:
         click.secho(message="\n❗ Error\n", fg="red")
         click.secho(message=traceback.format_exc(), fg="yellow")
-        return
+        sys.exit("Non-Existent Data Dir")
 
     with torch.no_grad():
         for i, (image, _) in enumerate(eval_dataloader):
