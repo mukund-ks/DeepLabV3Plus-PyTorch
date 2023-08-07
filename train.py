@@ -126,8 +126,8 @@ def main(
         click.secho(message="❗Error:", fg="red")
         traceback.print_exc()
 
-    train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-    test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+    train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
+    test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=2)
 
     # Defining Model
     model = DeepLabV3Plus(num_classes=CLASSES)
@@ -140,7 +140,7 @@ def main(
     optimizer = optim.Adam(model.parameters(), lr=LR, weight_decay=1e-8)
 
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer, mode="min", patience=5, factor=0.1, verbose=True
+        optimizer, mode="min", patience=3, factor=0.1, verbose=True
     )
 
     # For Early-Stopping
@@ -318,7 +318,7 @@ def main(
             )
 
             # Early-Stopping
-            if early_stop:    
+            if early_stop:
                 if no_improvement_epochs >= patience_epochs:
                     click.secho(
                         message=f"\nEarly Stopping: val_loss did not improve for {patience_epochs} epochs.\n",

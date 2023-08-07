@@ -19,7 +19,7 @@ class DiceLoss(nn.Module):
 
 
 def calculate_metrics(pred_mask: Any, true_mask: Any) -> torch.Tensor:
-    pred_mask = (pred_mask > 0.5).float()
+    pred_mask = pred_mask.float()
     true_mask = true_mask.float()
 
     intersection = torch.sum(pred_mask * true_mask)
