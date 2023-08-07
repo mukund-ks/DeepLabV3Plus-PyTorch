@@ -123,8 +123,9 @@ def main(
                 data_dir=data_dir, transformations=train_transform, split="test"
             )
     except Exception as _:
-        click.secho(message="❗Error:", fg="red")
-        traceback.print_exc()
+        click.secho(message="\n❗ Error \n", fg="red")
+        click.secho(message=traceback.format_exc(), fg="yellow")
+        return
 
     train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
     test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=2)
