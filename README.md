@@ -262,7 +262,8 @@ Distributed under the Apache 2.0 License. See [LICENSE](https://github.com/mukun
 
 ## Authors
 
-* [**Mukund Kumar Surehli**](https://github.com/mukund-ks/) - *Comp Sci Student* - *Built the Project.*
+* [**Mukund Kumar Surehli**](https://github.com/mukund-ks/) - *Comp Sci Student* 
+* [**Naveen Aggarwal**](https://github.com/navagg) - *Comp Sci Professor* - *Project Guide* 
 
 ## Acknowledgements
 
