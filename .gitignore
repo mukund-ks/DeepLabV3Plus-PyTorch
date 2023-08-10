@@ -7,5 +7,6 @@ eval_ews/
 eval_cvppp/
 eval_pss/
 augmented_data_ews/
+augmented_data_pss/
 eval_output/
 output/
