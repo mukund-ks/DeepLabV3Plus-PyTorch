@@ -14,7 +14,7 @@ from model import DeepLabV3Plus
 from metrics import DiceLoss, calculate_metrics
 
 INPUT = (256, 256)
-LR = 5e-4
+LR = 1e-3
 CLASSES = 1  # Binary Segmentation
 
 
@@ -121,7 +121,7 @@ def main(
                 data_dir=data_dir, transformations=train_transform, split="train"
             )
             test_dataset = CustomDataset(
-                data_dir=data_dir, transformations=train_transform, split="test"
+                data_dir=data_dir, transformations=test_transform, split="test"
             )
     except Exception as _:
         click.secho(message="\n❗ Error \n", fg="red")
@@ -139,7 +139,7 @@ def main(
 
     criterion = DiceLoss()
 
-    optimizer = optim.Adam(model.parameters(), lr=LR, weight_decay=1e-8)
+    optimizer = optim.Adam(model.parameters(), lr=LR)
 
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(
         optimizer, mode="min", patience=3, factor=0.1, verbose=True
