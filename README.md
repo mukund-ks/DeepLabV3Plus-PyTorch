@@ -207,17 +207,18 @@ Usage: train.py [OPTIONS]
   Refer to the Options below for usage.
 
 Options:
-  -d, --data-dir TEXT       Path for Data Directory.  [required]
-  -e, --num-epochs INTEGER  Number of epochs to train the model for. Default -
-                            25
-  -b, --batch-size INTEGER  Batch size of data for training. Default - 4
-  -p, --pre-split BOOLEAN   Opt-in to split data into Training and Validaton
-                            set.  [required]
-  -a, --augment BOOLEAN     Opt-in to apply augmentations to training set.
-                            Default - True
-  -s, --early-stop BOOLEAN  Stop training if val_loss hasn't improved for a
-                            certain no. of epochs. Default - True
-  --help                    Show this message and exit.
+  -D, --data-dir TEXT        Path for Data Directory  [required]
+  -E, --num-epochs INTEGER   Number of epochs to train the model for. Default
+                             - 25
+  -L, --learning-rate FLOAT  Learning Rate for model. Default - 1e-4
+  -B, --batch-size INTEGER   Batch size of data for training. Default - 4
+  -P, --pre-split BOOLEAN    Opt-in to split data into Training and Validaton
+                             set.  [required]
+  -A, --augment BOOLEAN      Opt-in to apply augmentations to training set.
+                             Default - True
+  -S, --early-stop BOOLEAN   Stop training if val_loss hasn't improved for a
+                             certain no. of epochs. Default - True
+  --help                     Show this message and exit.
 ```
 
 * For Evaluation, use [`evaluation.py`](https://github.com/mukund-ks/DeepLabV3Plus-PyTorch/blob/main/evaluation.py)
