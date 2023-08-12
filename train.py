@@ -14,42 +14,48 @@ from model import DeepLabV3Plus
 from metrics import DiceLoss, calculate_metrics
 
 INPUT = (256, 256)
-LR = 1e-3
 CLASSES = 1  # Binary Segmentation
 
 
 @click.command()
-@click.option("-d", "--data-dir", type=str, required=True, help="Path for Data Directory")
+@click.option("-D", "--data-dir", type=str, required=True, help="Path for Data Directory")
 @click.option(
-    "-e",
+    "-E",
     "--num-epochs",
     type=int,
     default=25,
     help="Number of epochs to train the model for. Default - 25",
 )
 @click.option(
-    "-b",
+    "-L",
+    "--learning-rate",
+    type=float,
+    default=1e-4,
+    help="Number of epochs to train the model for. Default - 25",
+)
+@click.option(
+    "-B",
     "--batch-size",
     type=int,
     default=4,
     help="Batch size of data for training. Default - 4",
 )
 @click.option(
-    "-p",
+    "-P",
     "--pre-split",
     required=True,
     type=bool,
     help="Opt-in to split data into Training and Validaton set.",
 )
 @click.option(
-    "-a",
+    "-A",
     "--augment",
     type=bool,
     default=True,
     help="Opt-in to apply augmentations to training set. Default - True",
 )
 @click.option(
-    "-s",
+    "-S",
     "--early-stop",
     type=bool,
     default=True,
@@ -58,6 +64,7 @@ CLASSES = 1  # Binary Segmentation
 def main(
     data_dir: str,
     num_epochs: int,
+    learning_rate: float,
     batch_size: int,
     pre_split: bool,
     augment: bool,
@@ -139,7 +146,7 @@ def main(
 
     criterion = DiceLoss()
 
-    optimizer = optim.Adam(model.parameters(), lr=LR)
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-4)
 
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(
         optimizer, mode="min", patience=3, factor=0.1, verbose=True
