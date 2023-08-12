@@ -31,7 +31,7 @@ CLASSES = 1  # Binary Segmentation
     "--learning-rate",
     type=float,
     default=1e-4,
-    help="Number of epochs to train the model for. Default - 25",
+    help="Learning Rate for model. Default - 1e-4",
 )
 @click.option(
     "-B",
