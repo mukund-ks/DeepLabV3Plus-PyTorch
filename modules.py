@@ -32,44 +32,13 @@ class ASPPModule(nn.Module):
     def __init__(self, in_channels: int, out_channels: int, dilations: list[int]) -> None:
         super(ASPPModule, self).__init__()
 
-        # Atrous Convolution 1
-        self.at_conv1 = nn.Conv2d(
-            in_channels,
-            out_channels,
-            kernel_size=3,
-            dilation=dilations[0],
-            padding="same",
-            bias=False,
-        )
-
-        # Atrous Convolution 2
-        self.at_conv2 = nn.Conv2d(
-            in_channels,
-            out_channels,
-            kernel_size=3,
-            dilation=dilations[1],
-            padding="same",
-            bias=False,
-        )
-
-        # Atrous Convolution 3
-        self.at_conv3 = nn.Conv2d(
-            in_channels,
-            out_channels,
-            kernel_size=3,
-            dilation=dilations[2],
-            padding="same",
-            bias=False,
-        )
-
-        self.at_conv4 = nn.Conv2d(
-            in_channels,
-            out_channels,
-            kernel_size=3,
-            dilation=dilations[3],
-            padding="same",
-            bias=False,
-        )
+        # Atrous Convolutions
+        self.atrous_convs = nn.ModuleList()
+        for d in dilations:
+            at_conv = nn.Conv2d(
+                in_channels, out_channels, kernel_size=3, dilation=d, padding="same", bias=False
+            )
+            self.atrous_convs.append(at_conv)
 
         self.batch_norm = nn.BatchNorm2d(out_channels)
 
@@ -106,24 +75,13 @@ class ASPPModule(nn.Module):
         x1 = self.dropout(x1)
         x1 = self.relu(x1)
 
-        # Atrous Convolution - Rate: 6
-        x2 = self.at_conv1(x)
-        x2 = self.batch_norm(x2)
-        x2 = self.relu(x2)
-
-        # Atrous Convolution - Rate: 12
-        x3 = self.at_conv2(x)
-        x3 = self.batch_norm(x3)
-        x3 = self.relu(x3)
-
-        # Atrous Convolution - Rate: 18
-        x4 = self.at_conv3(x)
-        x4 = self.batch_norm(x4)
-        x4 = self.relu(x4)
-
-        x5 = self.at_conv4(x)
-        x5 = self.batch_norm(x5)
-        x5 = self.relu(x5)
+        # Atrous Convolutions
+        atrous_outputs = []
+        for at_conv in self.atrous_convs:
+            at_output = at_conv(x)
+            at_output = self.batch_norm(at_output)
+            at_output = self.relu(at_output)
+            atrous_outputs.append(at_output)
 
         # Global Average Pooling and 1x1 Convolution for global context
         avg_pool = self.avgpool(x)
@@ -133,7 +91,7 @@ class ASPPModule(nn.Module):
         avg_pool = self.upsample(avg_pool)
 
         # Concatenating Dilated Convolutions and Global Average Pooling
-        combined_output = torch.cat((*[x1, x2, x3, x4, x5], avg_pool), dim=1)
+        combined_output = torch.cat((x1, *atrous_outputs, avg_pool), dim=1)
 
         # Final 1x1 Convolution for ASPP Output
         aspp_output = self.final_conv(combined_output)
