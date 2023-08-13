@@ -352,6 +352,7 @@ Distributed under the Apache 2.0 License. See [LICENSE](https://github.com/mukun
 * Zeiler, M. D., & Fergus, R. (2013, November 12). _Visualizing and Understanding Convolutional Networks_. Retrieved from https://arxiv.org/abs/1311.2901v3
 * Chen, L., Papandreou, G., Schroff, F., & Adam, H. (2017). [_Rethinking Atrous Convolution for Semantic Image Segmentation_](https://www.semanticscholar.org/paper/Rethinking-Atrous-Convolution-for-Semantic-Image-Chen-Papandreou/ee4a012a4b12d11d7ab8c0e79c61e807927a163c). ArXiv, abs/1706.05587.
 * Z. Zhang, X. Wang and C. Jung, [_DCSR: Dilated Convolutions for Single Image Super-Resolution_](https://ieeexplore.ieee.org/document/8502129), in IEEE Transactions on Image Processing, vol. 28, no. 4, pp. 1625-1635, April 2019, [doi: 10.1109/TIP.2018.2877483](https://ieeexplore.ieee.org/document/8502129).
+* K. He, X. Zhang, S. Ren and J. Sun, [*Deep Residual Learning for Image Recognition*](https://ieeexplore.ieee.org/document/7780459), 2016 IEEE Conference on Computer Vision and Pattern Recognition (CVPR), Las Vegas, NV, USA, 2016, pp. 770-778, [doi: 10.1109/CVPR.2016.90](https://ieeexplore.ieee.org/document/7780459).
 * [EWS Dataset](https://doi.org/10.3389/fpls.2021.774068)
 * [Plant Phenotyping Dataset](https://www.plant-phenotyping.org/datasets)
 * [Plant Semantic Segmentation Dataset by HIL](https://humansintheloop.org/resources/datasets/plant-segmentation/)
