@@ -19,7 +19,7 @@ class DeepLabV3Plus(nn.Module):
         out_channels = 256
 
         # Dilation Rates
-        dilations = [6, 12, 18]
+        dilations = [6, 12, 18, 24]
 
         # ASPP Module
         self.aspp = ASPPModule(in_channels, out_channels, dilations)
