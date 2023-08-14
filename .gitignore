@@ -2,6 +2,7 @@ __pycache__
 data_ews/
 data_cvppp/
 data_pss/
+best_cvppp/
 env/
 eval_ews/
 eval_cvppp/
