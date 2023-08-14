@@ -140,7 +140,7 @@ class DecoderModule(nn.Module):
 
         # Upsampling High-Level Features
         x_high = self.upsample(x_high)
-        # x_high = self.dropout(x_high)
+        x_high = self.dropout(x_high)
 
         # 1x1 Convolution on Low-Level Features
         x_low = self.conv_low(x_low)
