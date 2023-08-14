@@ -3,6 +3,7 @@ data_ews/
 data_cvppp/
 data_pss/
 best_cvppp/
+augmented_data_cvppp/
 env/
 eval_ews/
 eval_cvppp/
