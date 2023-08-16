@@ -66,7 +66,7 @@ _Datasets used during development of this project are described below:_
 
 * [CVPPP Dataset](https://www.plant-phenotyping.org/datasets-home)
   
-  The Computer Vision Problems in Plant Phenotyping (CVPPP) Dataset provides 27 images of tobacco and 783 Arabidopsis images in separate folders. Using a camera with a single plant in its range of view, tobacco photos were gathered. Images of the Arabidopsis plant were taken with a camera that had a wider field of view and were later cropped.  The photographs were shot over a period of days from mutants or wild types, and they came from two different experimental settings, where the field of vision was different.
+  The Computer Vision Problems in Plant Phenotyping (CVPPP) Leaf Counting Challenge (LCC) 2017 Dataset provides 27 images of tobacco and 783 Arabidopsis images in separate folders. Using a camera with a single plant in its range of view, tobacco photos were gathered. Images of the Arabidopsis plant were taken with a camera that had a wider field of view and were later cropped.  The photographs were shot over a period of days from mutants or wild types, and they came from two different experimental settings, where the field of vision was different.
 
   Additionally, certain plants are slightly out of focus than others due to the wider range of view. Though, the backgrounds of most photographs are straightforward and static, occasionally, moss growth or the presence of water in the growing tray complicates the scene.
   For the purpose of obtaining ground truth masks for every leaf/plant in the picture, each image was manually labeled.
