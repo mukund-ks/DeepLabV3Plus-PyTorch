@@ -84,7 +84,7 @@ Known for its precise pixel-by-pixel image segmentation skills, DeepLabV3+ is a 
 
 ### ResNet Backbone
 
-Residual Networks, often known as ResNets, are a class of deep neural network architectures created to address the vanishing gradient problem that can arise in very deep networks. They were first presented in the 2015 publication [*Deep Residual Learning for Image Recognition*](https://ieeexplore.ieee.org/document/7780459) by Kaiming He et al. ResNets have been extensively used for a number of tasks, including image classification, object recognition, and segmentation.
+Residual Networks, often known as ResNets, are a class of deep neural network architectures created to address the vanishing gradient problem that can arise in very deep networks. They were first presented in the 2015 publication [*Deep Residual Learning for Image Recognition*](https://ieeexplore.ieee.org/document/7780459) by **Kaiming He et al**. ResNets have been extensively used for a number of tasks, including image classification, object recognition, and segmentation.
 
 The main novelty in ResNets is the introduction of residual blocks, which allow for the training of extremely deep networks by providing shortcut connections (skip connections) that omit one or more layers. Through the use of these connections, gradients can pass directly through the network without disappearing or blowing up, enabling the training of far more complex structures.
 
@@ -105,7 +105,7 @@ ResNets are available in a range of depths, designated as ResNet-XX, where XX is
   
   This Module enables the network to generate precise and contextually rich segmentation maps by including skip links and mixing data from various scales. This is crucial for tasks like semantic segmentation, where accurate delineation of object boundaries is necessary for producing high-quality results.
 
-* ***Squeeze & Excitation (SE):*** It is a mechanism made to increase the convolutional neural networks' representational strength by explicitly modeling channel-wise interactions. Jie Hu et al. first discussed it in their publication [*Squeeze-and-Excitation Networks*](https://ieeexplore.ieee.org/document/8578843) published in 2018. In order to enable the model to focus greater attention on crucial features, the SE Module seeks to selectively emphasize informative channels while suppressing less critical ones within the network. 
+* ***Squeeze & Excitation (SE):*** It is a mechanism made to increase the convolutional neural networks' representational strength by explicitly modeling channel-wise interactions. **Jie Hu et al.** first discussed it in their publication [*Squeeze-and-Excitation Networks*](https://ieeexplore.ieee.org/document/8578843) published in 2018. In order to enable the model to focus greater attention on crucial features, the SE Module seeks to selectively emphasize informative channels while suppressing less critical ones within the network. 
   
   By computing the average value of each channel across all spatial dimensions, the global average pooling method is used. The end result is a channel-wise descriptor that accurately reflects the significance of each channel in relation to the overall feature map. 
 
