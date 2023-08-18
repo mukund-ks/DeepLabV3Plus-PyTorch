@@ -5,6 +5,10 @@ from modules import ASPPModule, DecoderModule
 from torchsummary import summary
 from typing import Any
 
+# TODO:
+#   * Test Leaky RELU & Normalized Tanh
+#   * Test SE Module on Low-Level Features
+
 
 class DeepLabV3Plus(nn.Module):
     def __init__(self, num_classes: int = 1) -> None:
