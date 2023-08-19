@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 from typing import Any
 
+# TODO:
+#   * Squeeze & Exciation for Skip Connections?
 
 class SEModule(nn.Module):
     def __init__(self, channels: int, ratio: int = 8) -> None:
