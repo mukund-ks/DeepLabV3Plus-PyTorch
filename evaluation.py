@@ -16,7 +16,7 @@ INPUT = (256, 256)
 
 
 @click.command()
-@click.option("-d", "--data-dir", type=str, required=True, help="Path for Data Directory")
+@click.option("-D", "--data-dir", type=str, required=True, help="Path for Data Directory")
 def main(data_dir: str) -> None:
     """
     Evaluation Script for DeepLabV3+ with ResNet50 Encoder for Binary Segmentation.\n
