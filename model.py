@@ -22,7 +22,7 @@ class DeepLabV3Plus(nn.Module):
         out_channels = 256
 
         # Dilation Rates
-        dilations = [6, 12, 18, 24]
+        dilations = [6, 12, 18]
         
         # SE Module
         self.squeeze_excite = SEModule(channels=out_channels)
@@ -35,6 +35,9 @@ class DeepLabV3Plus(nn.Module):
 
         # Upsampling with Bilinear Interpolation
         self.upsample = nn.UpsamplingBilinear2d(scale_factor=4)
+        
+        # Dropout 
+        self.dropout = nn.Dropout(p=0.5)
 
         # Final 1x1 Convolution
         self.final_conv = nn.Conv2d(out_channels, num_classes, kernel_size=1)
@@ -54,14 +57,18 @@ class DeepLabV3Plus(nn.Module):
 
         # ASPP forward pass - High-Level Features
         x = self.aspp(x)
+        
+        # Upsampling High-Level Features
+        x = self.upsample(x)
+        x = self.dropout(x)
 
         # Decoder forward pass - Concatenating Features
         x = self.decoder(x, x_low)
 
-        # Upsampling Concatenated Features
+        # Upsampling Concatenated Features from Decoder
         x = self.upsample(x)
 
-        # Final 1x1 Convolution for Binary-Seg
+        # Final 1x1 Convolution for Binary-Segmentation
         x = self.final_conv(x)
         x = self.sigmoid(x)
 

@@ -47,6 +47,9 @@ class ASPPModule(nn.Module):
         self.relu = nn.ReLU()
 
         self.dropout = nn.Dropout(p=0.5)
+        
+        # Squeeze & Excite
+        self.squeeze_excite = SEModule(channels=out_channels)
 
         # Upsampling by Bilinear Interpolation
         self.upsample = nn.UpsamplingBilinear2d(scale_factor=16)
@@ -98,6 +101,7 @@ class ASPPModule(nn.Module):
         # Final 1x1 Convolution for ASPP Output
         aspp_output = self.final_conv(combined_output)
         aspp_output = self.batch_norm(aspp_output)
+        aspp_output = self.squeeze_excite(aspp_output)
         aspp_output = self.dropout(aspp_output)
         aspp_output = self.relu(aspp_output)
 
@@ -112,9 +116,6 @@ class DecoderModule(nn.Module):
         self.squeeze_excite = SEModule(channels=304)
 
         self.squeeze_excite2 = SEModule(channels=out_channels)
-
-        # Upsampling by Bilinear Interpolation
-        self.upsample = nn.UpsamplingBilinear2d(scale_factor=4)
 
         # 1x1 Convolution
         self.conv_low = nn.Conv2d(in_channels, 48, kernel_size=1, padding="same", bias=False)
@@ -139,10 +140,6 @@ class DecoderModule(nn.Module):
 
     def forward(self, x_high: Any, x_low: Any) -> Any:
         # Decoder Forward Pass
-
-        # Upsampling High-Level Features
-        x_high = self.upsample(x_high)
-        x_high = self.dropout(x_high)
 
         # 1x1 Convolution on Low-Level Features
         x_low = self.conv_low(x_low)
