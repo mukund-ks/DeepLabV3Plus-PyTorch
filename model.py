@@ -23,7 +23,7 @@ class DeepLabV3Plus(nn.Module):
 
         # Dilation Rates
         dilations = [6, 12, 18]
-        
+
         # SE Module
         self.squeeze_excite = SEModule(channels=out_channels)
 
@@ -35,8 +35,8 @@ class DeepLabV3Plus(nn.Module):
 
         # Upsampling with Bilinear Interpolation
         self.upsample = nn.UpsamplingBilinear2d(scale_factor=4)
-        
-        # Dropout 
+
+        # Dropout
         self.dropout = nn.Dropout(p=0.5)
 
         # Final 1x1 Convolution
@@ -44,6 +44,8 @@ class DeepLabV3Plus(nn.Module):
 
         # Sigmoid Activation for Binary-Seg
         self.sigmoid = nn.Sigmoid()
+
+        self.tanh = nn.Tanh()
 
     def forward(self, x: Any) -> Any:
         # DeepLabV3+ Forward Pass
@@ -57,7 +59,7 @@ class DeepLabV3Plus(nn.Module):
 
         # ASPP forward pass - High-Level Features
         x = self.aspp(x)
-        
+
         # Upsampling High-Level Features
         x = self.upsample(x)
         x = self.dropout(x)
@@ -70,9 +72,11 @@ class DeepLabV3Plus(nn.Module):
 
         # Final 1x1 Convolution for Binary-Segmentation
         x = self.final_conv(x)
-        x = self.sigmoid(x)
+        # x = self.sigmoid(x)
+        x = self.tanh(x)
+        normalized_x = (x + 1) * 0.5
 
-        return x
+        return normalized_x
 
 
 if __name__ == "__main__":
