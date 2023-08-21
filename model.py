@@ -5,10 +5,6 @@ from modules import ASPPModule, DecoderModule, SEModule
 from torchsummary import summary
 from typing import Any
 
-# TODO:
-#   * Test Leaky RELU & Normalized Tanh
-#   * Test SE Module on Low-Level Features
-
 
 class DeepLabV3Plus(nn.Module):
     def __init__(self, num_classes: int = 1) -> None:
@@ -22,7 +18,7 @@ class DeepLabV3Plus(nn.Module):
         out_channels = 256
 
         # Dilation Rates
-        dilations = [6, 12, 18]
+        dilations = [6, 12, 18, 24]
 
         # SE Module
         self.squeeze_excite = SEModule(channels=out_channels)
