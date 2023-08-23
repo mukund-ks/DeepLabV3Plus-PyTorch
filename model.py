@@ -19,10 +19,7 @@ class DeepLabV3Plus(nn.Module):
 
         # Dilation Rates
         dilations = [6, 12, 18, 24]
-
-        # SE Module
-        self.squeeze_excite = SEModule(channels=out_channels)
-
+        
         # ASPP Module
         self.aspp = ASPPModule(in_channels, out_channels, dilations)
 
@@ -48,7 +45,6 @@ class DeepLabV3Plus(nn.Module):
 
         # Getting Low-Level Features
         x_low = self.backbone[:-3](x)
-        x_low = self.squeeze_excite(x_low)
 
         # Getting Image Features from Backbone
         x = self.backbone[:-1](x)

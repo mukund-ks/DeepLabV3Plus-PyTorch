@@ -53,7 +53,7 @@ class ASPPModule(nn.Module):
         self.dropout = nn.Dropout(p=0.5)
 
         # Squeeze & Excite
-        self.squeeze_excite = SEModule(channels=out_channels)
+        # self.squeeze_excite = SEModule(channels=out_channels)
 
         # Upsampling by Bilinear Interpolation
         self.upsample = nn.UpsamplingBilinear2d(scale_factor=16)
@@ -109,7 +109,7 @@ class ASPPModule(nn.Module):
         aspp_output = self.final_conv(combined_output)
         aspp_output = self.batch_norm(aspp_output)
         # aspp_output = self.squeeze_excite(aspp_output)
-        aspp_output = self.dropout(aspp_output)
+        # aspp_output = self.dropout(aspp_output)
         # aspp_output = self.relu(aspp_output)
         aspp_output = self.leaky_relu(aspp_output)
 
@@ -124,6 +124,8 @@ class DecoderModule(nn.Module):
         self.squeeze_excite = SEModule(channels=304)
 
         self.squeeze_excite2 = SEModule(channels=out_channels)
+        
+        self.squeeze_excite3 = SEModule(channels=48)
 
         # 1x1 Convolution
         self.conv_low = nn.Conv2d(in_channels, 48, kernel_size=1, padding="same", bias=False)
@@ -157,6 +159,7 @@ class DecoderModule(nn.Module):
         x_low = self.dropout(x_low)
         # x_low = self.relu(x_low)
         x_low = self.leaky_relu(x_low)
+        x_low = self.squeeze_excite3(x_low)
 
         # Concatenating High-Level and Low-Level Features
         x = torch.cat((x_high, x_low), dim=1)
