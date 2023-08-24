@@ -25,6 +25,7 @@
 - [Results](#results)
   - [EWS](#ews)
   - [CVPPP](#cvppp)
+  - [PSS](#pss)
 - [Built With](#built-with)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
@@ -143,13 +144,13 @@ A collection of 63 photos from the divides **A1** through **A4** were assembled 
 
 Model training was done on **A1**, **A2**, **A3**, and **A4** separately for the outcomes of this repository's model. A separate split of 267 photos, consisting of 46 images from **A1**, 20 images from **A2**, and 201 images from **A4**, was also created and utilized for training.
 
-|         Split         |  IoU  | Dice-Loss |
-| :-------------------: | :---: | :-------: |
-|          A1           | 0.371 |   0.498   |
-|          A2           | 0.865 |   0.100   |
-|          A3           | 0.614 |   0.410   |
-|          A4           | 0.907 |   0.069   |
-| A1+A2+A4 (Model v1.6) | 0.942 |   0.044   |
+|         Split         |    IoU    | Dice-Loss |
+| :-------------------: | :-------: | :-------: |
+|          A1           |   0.371   |   0.498   |
+|          A2           |   0.865   |   0.100   |
+|          A3           |   0.614   |   0.410   |
+|          A4           |   0.907   |   0.069   |
+| A1+A2+A4 (Model v1.6) | **0.942** | **0.044** |
 
 |                               ![A2 Result](assets/CVPPP_2.png)                                |
 | :-------------------------------------------------------------------------------------------: |
@@ -166,6 +167,23 @@ Model training was done on **A1**, **A2**, **A3**, and **A4** separately for the
 |                              ![Model v1.6 Result](assets/CVPPP_5.png)                               |
 | :-------------------------------------------------------------------------------------------------: |
 | *A1+A2+A4 Result* <br> *Left to Right: Input Image, Ground Truth, Predicted Mask, Segmented Output* |
+
+
+### PSS
+
+There are 144 photos in the Humans in the Loop (HIL) Plant Semantic Segmentation (PSS) Dataset. No additional splits were created because of the smaller size of the dataset. The masks from the dataset, however, were thresholded to only contain black or white color. Black is the background, whereas white is the plant.
+
+Data Augmentations were used during training of the model.
+
+The best model found for this dataset produced the results listed below.
+
+|   Model    |  IoU  | Dice-Loss |
+| :--------: | :---: | :-------: |
+| Best Model | 0.603 |   0.315   |
+
+|                             ![PSS Best Result](assets/PSS_Best_Model.png)                             |
+| :---------------------------------------------------------------------------------------------------: |
+| *Best Model Result* <br> *Left to Right: Input Image, Ground Truth, Predicted Mask, Segmented Output* |
 
 ## Built With
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
