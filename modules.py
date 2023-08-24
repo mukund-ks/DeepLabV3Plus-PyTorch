@@ -52,9 +52,6 @@ class ASPPModule(nn.Module):
 
         self.dropout = nn.Dropout(p=0.5)
 
-        # Squeeze & Excite
-        # self.squeeze_excite = SEModule(channels=out_channels)
-
         # Upsampling by Bilinear Interpolation
         self.upsample = nn.UpsamplingBilinear2d(scale_factor=16)
 
@@ -108,8 +105,6 @@ class ASPPModule(nn.Module):
         # Final 1x1 Convolution for ASPP Output
         aspp_output = self.final_conv(combined_output)
         aspp_output = self.batch_norm(aspp_output)
-        # aspp_output = self.squeeze_excite(aspp_output)
-        # aspp_output = self.dropout(aspp_output)
         # aspp_output = self.relu(aspp_output)
         aspp_output = self.leaky_relu(aspp_output)
 
