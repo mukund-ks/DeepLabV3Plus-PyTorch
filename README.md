@@ -82,6 +82,10 @@ The ultimate objective of the project is to develop a strong model that can accu
 
 The objective of binary segmentation, often referred to as semantic binary segmentation, is to categorize each pixel in an image into one of two groups: the foreground (object of interest), or the background. A powerful Encoder-Decoder based architecture for solving binary segmentation challenges, DeepLabV3+ with ResNet50 or ResNet101 as the backbone offers great accuracy and spatial precision.
 
+| ![Architecure](diagrams/DeepLabV3Plus-Architecture-PyTorch.png) |
+| :-------------------------------------------------------------: |
+|     *Architecture of this Repository's Model - DeepLabV3+*      |
+
 ### DeepLabV3+
 
 Known for its precise pixel-by-pixel image segmentation skills, DeepLabV3+ is a powerful semantic segmentation model. It combines a robust feature extractor, such as ResNet50 or ResNet101, with an effective decoder. This architecture does a great job of capturing both local and global context information, which makes it suitable for tasks where accurate object boundaries and fine details are important. A crucial part is the Atrous Spatial Pyramid Pooling (ASPP) module, which uses several dilated convolutions to collect data on multiple scales. The decoder further improves the output by fusing high-level semantic features with precise spatial data. Highly precise segmentations across a variety of applications are made possible by this fusion of context and location awareness.
@@ -114,6 +118,10 @@ ResNets are available in a range of depths, designated as ResNet-XX, where XX is
   By computing the average value of each channel across all spatial dimensions, the global average pooling method is used. The end result is a channel-wise descriptor that accurately reflects the significance of each channel in relation to the overall feature map. 
 
   The channels are then adaptively recalibrated using the squeezed information. Two fully connected layers are utilized for this. A non-linear activation function, also known as ReLU, is added after the first layer, which minimizes the dimensionality of the squeezed descriptor. A set of channel-wise excitation weights is produced after the second layer returns the dimensionality to the original number of channels. Each channel's weights indicate how much it should be boosted or muted.
+
+  | ![Squeeze & Excite Diagram](diagrams/Squeeze-Excitation-Diagram.png) |
+  | :------------------------------------------------------------------: |
+  |                    *Squeeze & Excitation Module*                     |
 
 ## Results
 
