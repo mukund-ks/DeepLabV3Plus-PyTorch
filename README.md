@@ -24,7 +24,7 @@
   - [Modules used](#modules-used)
 - [Results](#results)
   - [EWS](#ews)
-    - [ResNet50 Backbone](#resnet50-backbone)
+  - [CVPPP](#cvppp)
 - [Built With](#built-with)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
@@ -122,8 +122,6 @@ Results of the developed Model on EWS, PSS and CVPPP Dataset.
 
 On the basis of IoU, the results of this repository's best performing model are compared to [Zenkl et al. (2022)](https://www.frontiersin.org/articles/10.3389/fpls.2021.774068/full), [Yu et al. (2017)](https://plantmethods.biomedcentral.com/articles/10.1186/s13007-017-0168-4), [Sadeghi-Tehran et al. (2020)](https://spj.science.org/doi/10.34133/2020/3521852) and [Rico-Fernández et al. (2018)](https://www.sciencedirect.com/science/article/abs/pii/S0168169918301911?via%3Dihub).
 
-#### ResNet50 Backbone
-
 | Benchmark                        |    IoU    |
 | :------------------------------- | :-------: |
 | **Repository (Model v1.4)**      | **0.744** |
@@ -137,6 +135,37 @@ On the basis of IoU, the results of this repository's best performing model are 
 | *ResNet50 Model v1.4 Result* <br> *Left to Right: Input Image, Ground Truth, Predicted Mask, Segmented Output* |
 
 
+### CVPPP
+
+Totaling 810 pictures of Tobacco and Arabidopsis plants, the CVPPP LCC 2017 Dataset is divided into 4 directories, **A1** through **A4**. Arabidopsis plant photos are included in divides **A1**, **A2**, and **A4**, which have 128, 31, and 624 images, respectively. 27 photos of tobacco plants are included in **A3**.
+
+A collection of 63 photos from the divides **A1** through **A4** were assembled to form an evaluation set, representing each split.
+
+Model training was done on **A1**, **A2**, **A3**, and **A4** separately for the outcomes of this repository's model. A separate split of 267 photos, consisting of 46 images from **A1**, 20 images from **A2**, and 201 images from **A4**, was also created and utilized for training.
+
+|         Split         |  IoU  | Dice-Loss |
+| :-------------------: | :---: | :-------: |
+|          A1           | 0.371 |   0.498   |
+|          A2           | 0.865 |   0.100   |
+|          A3           | 0.614 |   0.410   |
+|          A4           | 0.907 |   0.069   |
+| A1+A2+A4 (Model v1.6) | 0.942 |   0.044   |
+
+|                               ![A2 Result](assets/CVPPP_2.png)                                |
+| :-------------------------------------------------------------------------------------------: |
+| *A2 Result* <br> *Left to Right: Input Image, Ground Truth, Predicted Mask, Segmented Output* |
+
+|                               ![A3 Result](assets/CVPPP_3.png)                                |
+| :-------------------------------------------------------------------------------------------: |
+| *A3 Result* <br> *Left to Right: Input Image, Ground Truth, Predicted Mask, Segmented Output* |
+
+|                               ![A4 Result](assets/CVPPP_4.png)                                |
+| :-------------------------------------------------------------------------------------------: |
+| *A4 Result* <br> *Left to Right: Input Image, Ground Truth, Predicted Mask, Segmented Output* |
+
+|                              ![Model v1.6 Result](assets/CVPPP_5.png)                               |
+| :-------------------------------------------------------------------------------------------------: |
+| *A1+A2+A4 Result* <br> *Left to Right: Input Image, Ground Truth, Predicted Mask, Segmented Output* |
 
 ## Built With
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
