@@ -13,11 +13,11 @@ class SEModule(nn.Module):
         # Excitation Operation
         self.fc = nn.Sequential(
             nn.Linear(channels, channels // ratio),
-            # nn.ReLU(inplace=True),
-            nn.LeakyReLU(negative_slope=0.1, inplace=True),
+            nn.ReLU(inplace=True),
+            # nn.LeakyReLU(negative_slope=0.1, inplace=True),
             nn.Linear(channels // ratio, channels),
-            # nn.Sigmoid(),
-            nn.Tanh(),
+            nn.Sigmoid(),
+            # nn.Tanh(),
         )
 
     def forward(self, x: Any) -> Any:
@@ -27,9 +27,10 @@ class SEModule(nn.Module):
         y = self.avgpool(x).view(b, c)
         y = self.fc(y).view(b, c, 1, 1)
 
-        y_normalized = (y + 1) * 0.5
+        # For Tanh
+        # y_normalized = (y + 1) * 0.5
 
-        return x * y_normalized
+        return x * y
 
 
 class ASPPModule(nn.Module):
@@ -47,8 +48,10 @@ class ASPPModule(nn.Module):
         self.batch_norm = nn.BatchNorm2d(out_channels)
 
         self.relu = nn.ReLU()
+        
+        self.squeeze_excite = SEModule(channels=out_channels)
 
-        self.leaky_relu = nn.LeakyReLU(0.1)
+        # self.leaky_relu = nn.LeakyReLU(0.1)
 
         self.dropout = nn.Dropout(p=0.5)
 
@@ -79,25 +82,28 @@ class ASPPModule(nn.Module):
         x1 = self.conv1x1(x)
         x1 = self.batch_norm(x1)
         x1 = self.dropout(x1)
-        # x1 = self.relu(x1)
-        x1 = self.leaky_relu(x1)
+        x1 = self.relu(x1)
+        # x1 = self.leaky_relu(x1)
+        x1 = self.squeeze_excite(x1)
 
         # Atrous Convolutions
         atrous_outputs = []
         for at_conv in self.atrous_convs:
             at_output = at_conv(x)
             at_output = self.batch_norm(at_output)
-            # at_output = self.relu(at_output)
-            at_output = self.leaky_relu(at_output)
+            at_output = self.relu(at_output)
+            # at_output = self.leaky_relu(at_output)
+            at_output = self.squeeze_excite(at_output)
             atrous_outputs.append(at_output)
 
         # Global Average Pooling and 1x1 Convolution for global context
         avg_pool = self.avgpool(x)
         avg_pool = self.conv1x1(avg_pool)
         avg_pool = self.batch_norm(avg_pool)
-        # avg_pool = self.relu(avg_pool)
-        avg_pool = self.leaky_relu(avg_pool)
+        avg_pool = self.relu(avg_pool)
+        # avg_pool = self.leaky_relu(avg_pool)
         avg_pool = self.upsample(avg_pool)
+        avg_pool = self.squeeze_excite(avg_pool)
 
         # Concatenating Dilated Convolutions and Global Average Pooling
         combined_output = torch.cat((x1, *atrous_outputs, avg_pool), dim=1)
@@ -105,8 +111,9 @@ class ASPPModule(nn.Module):
         # Final 1x1 Convolution for ASPP Output
         aspp_output = self.final_conv(combined_output)
         aspp_output = self.batch_norm(aspp_output)
-        # aspp_output = self.relu(aspp_output)
-        aspp_output = self.leaky_relu(aspp_output)
+        aspp_output = self.relu(aspp_output)
+        # aspp_output = self.leaky_relu(aspp_output)
+        aspp_output = self.squeeze_excite(aspp_output)
 
         return aspp_output
 
@@ -131,7 +138,7 @@ class DecoderModule(nn.Module):
 
         self.relu = nn.ReLU()
 
-        self.leaky_relu = nn.LeakyReLU(0.1)
+        # self.leaky_relu = nn.LeakyReLU(0.1)
 
         self.dropout = nn.Dropout(p=0.5)
 
@@ -152,8 +159,8 @@ class DecoderModule(nn.Module):
         x_low = self.conv_low(x_low)
         x_low = self.batch_norm(x_low)
         x_low = self.dropout(x_low)
-        # x_low = self.relu(x_low)
-        x_low = self.leaky_relu(x_low)
+        x_low = self.relu(x_low)
+        # x_low = self.leaky_relu(x_low)
         x_low = self.squeeze_excite3(x_low)
 
         # Concatenating High-Level and Low-Level Features
@@ -164,15 +171,15 @@ class DecoderModule(nn.Module):
         # 3x3 Convolution on Concatenated Feature Map
         x = self.final_conv1(x)
         x = self.batch_norm2(x)
-        # x = self.relu(x)
-        x = self.leaky_relu(x)
+        x = self.relu(x)
+        # x = self.leaky_relu(x)
         x = self.squeeze_excite2(x)
 
         # 3x3 Convolution on Concatenated Feature Map
         x = self.final_conv2(x)
         x = self.batch_norm2(x)
-        # x = self.relu(x)
-        x = self.leaky_relu(x)
+        x = self.relu(x)
+        # x = self.leaky_relu(x)
         x = self.squeeze_excite2(x)
 
         return x

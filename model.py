@@ -19,7 +19,7 @@ class DeepLabV3Plus(nn.Module):
 
         # Dilation Rates
         dilations = [6, 12, 18, 24]
-        
+
         # ASPP Module
         self.aspp = ASPPModule(in_channels, out_channels, dilations)
 
@@ -38,7 +38,17 @@ class DeepLabV3Plus(nn.Module):
         # Sigmoid Activation for Binary-Seg
         self.sigmoid = nn.Sigmoid()
 
-        self.tanh = nn.Tanh()
+        # self.tanh = nn.Tanh()
+        
+        # Initialize weights
+        self.init_weights()
+
+    def init_weights(self):
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
+                nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
+                if m.bias is not None:
+                    nn.init.constant_(m.bias, 0)
 
     def forward(self, x: Any) -> Any:
         # DeepLabV3+ Forward Pass
@@ -64,11 +74,13 @@ class DeepLabV3Plus(nn.Module):
 
         # Final 1x1 Convolution for Binary-Segmentation
         x = self.final_conv(x)
-        # x = self.sigmoid(x)
-        x = self.tanh(x)
-        normalized_x = (x + 1) * 0.5
+        x = self.sigmoid(x)
+        # x = self.tanh(x)
+        
+        # For Tanh
+        # normalized_x = (x + 1) * 0.5
 
-        return normalized_x
+        return x
 
 
 if __name__ == "__main__":
